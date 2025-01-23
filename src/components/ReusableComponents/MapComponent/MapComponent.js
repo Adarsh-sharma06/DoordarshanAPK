@@ -1,85 +1,99 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
-import './MapComponent.css'; // Assuming you'll add styles for the popup here
+import 'leaflet-routing-machine'; // Required for routing
+import RoutingMachine from 'react-leaflet-routing-machine'; // Component to handle routing
+import './MapComponent.css';
 import { db } from '../../../service/firebase'; // Import your Firebase config
 
-// Define a custom icon generator function for vehicles
 const createVehicleIcon = (heading = 0) => {
   return new L.DivIcon({
     className: 'vehicle-icon',
-    html: `<img src="/images/car.png" alt="Vehicle" style="transform: rotate(${heading}deg); width: 30px; height: 30px; rgba(0, 0, 0, 0.5);"/>`, // Improved shadow effect
-    iconSize: [30, 30], // Adjusted size
-    iconAnchor: [15, 15], // Adjusted anchor to make it centered
+    html: `<img src="/images/car.png" alt="Vehicle" style="transform: rotate(${heading}deg); width: 40px; height: 40px;"/>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
   });
 };
 
-// Office Location (Example coordinates)
-const officeLocation = { lat: 23.04771370240098, lng: 72.52459693002172 }; // Change to your office's location
-
-// Function to calculate distance between two points (in kilometers) using Haversine formula
 const calculateDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371; // Radius of the Earth in km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLng = (lng2 - lng1) * (Math.PI / 180);
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+    Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c; // Distance in km
-  return distance;
+  return R * c; // Distance in km
 };
+
+const officeLocation = { lat: 23.04771370240098, lng: 72.52459693002172 };
 
 function MapComponent({ vehicleData = [] }) {
   const [driversProfile, setDriversProfile] = useState({});
+  const [zoomLevel, setZoomLevel] = useState(13);
+  const [selectedVehicle, setSelectedVehicle] = useState(null); // To store the clicked vehicle
+  const mapRef = useRef();
 
-  // Fetch driver profile from users collection using email as document ID
   const fetchDriverProfile = async (email) => {
     try {
       const userDoc = await db.collection('users').doc(email).get();
       if (userDoc.exists) {
-        setDriversProfile(prevState => ({
+        setDriversProfile((prevState) => ({
           ...prevState,
-          [email]: userDoc.data(), // Store profile data by email key
+          [email]: userDoc.data(),
         }));
       }
     } catch (error) {
-      console.error("Error fetching driver profile: ", error);
+      console.error('Error fetching driver profile: ', error);
     }
   };
 
   useEffect(() => {
-    // Fetch driver profiles when vehicleData is available
-    vehicleData.forEach(vehicle => {
+    vehicleData.forEach((vehicle) => {
       if (vehicle.driverEmail) {
-        fetchDriverProfile(vehicle.driverEmail); // Assuming driverEmail exists in vehicleData
+        fetchDriverProfile(vehicle.driverEmail);
       }
     });
   }, [vehicleData]);
 
-  // Use useMemo to avoid recalculating center on every render
-  const center = useMemo(() => {
-    if (vehicleData.length === 0) return [officeLocation.lat, officeLocation.lng]; // Default to office location
-    return [
-      vehicleData.reduce((acc, vehicle) => acc + vehicle.lat, 0) / vehicleData.length,
-      vehicleData.reduce((acc, vehicle) => acc + vehicle.lng, 0) / vehicleData.length,
-    ];
-  }, [vehicleData]);
+  useEffect(() => {
+    const map = mapRef.current;
 
-  const zoomLevel = vehicleData.length > 1 ? 10 : 13;
+    if (map) {
+      map.on('zoomend', () => {
+        const newZoomLevel = map.getZoom();
+        setZoomLevel(newZoomLevel);
+      });
+    }
+  }, []);
+
+  const officeIcon = useMemo(() => {
+    const size = 30 + zoomLevel * 2;
+    return new L.Icon({
+      iconUrl: '/images/office.gif',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+    });
+  }, [zoomLevel]);
 
   return (
     <div className="map-container">
-      <MapContainer center={center} zoom={zoomLevel} zoomControl={false} style={{ height: '100vh' }}>
+      <MapContainer
+        center={[officeLocation.lat, officeLocation.lng]}
+        zoom={zoomLevel}
+        zoomControl={false}
+        style={{ height: '100vh' }}
+        whenCreated={(mapInstance) => (mapRef.current = mapInstance)}
+      >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        
-        {/* Office Marker with custom image */}
-        <Marker position={[officeLocation.lat, officeLocation.lng]} icon={new L.Icon({
-          iconUrl: '/images/office-marker.png', // Custom office marker image
-          iconSize: [40, 40], // Adjusted size for office marker
-          iconAnchor: [20, 40], // Anchor to the bottom of the icon
-        })}>
+
+        {/* Office Marker */}
+        <Marker position={[officeLocation.lat, officeLocation.lng]} icon={officeIcon}>
           <Popup>
             <strong>Office Location</strong>
             <br />
@@ -87,11 +101,11 @@ function MapComponent({ vehicleData = [] }) {
           </Popup>
         </Marker>
 
-        {/* Display markers for vehicles with smooth movement */}
+        {/* Vehicle Markers */}
         {vehicleData.map((vehicle, index) => {
-          const vehicleIcon = createVehicleIcon(vehicle.heading || 0); // Dynamically set the icon with rotation
+          const vehicleIcon = createVehicleIcon(vehicle.heading || 0);
           const distanceToOffice = calculateDistance(vehicle.lat, vehicle.lng, officeLocation.lat, officeLocation.lng);
-          const driverProfile = driversProfile[vehicle.driverEmail] || {}; // Get profile if it exists
+          const driverProfile = driversProfile[vehicle.driverEmail] || {}; // Access the driver profile data
 
           return (
             <Marker key={index} position={[vehicle.lat, vehicle.lng]} icon={vehicleIcon}>
@@ -106,7 +120,6 @@ function MapComponent({ vehicleData = [] }) {
                     <p><strong>Distance to Office:</strong> {distanceToOffice.toFixed(2)} km</p>
                   </div>
 
-                  {/* Driver Information */}
                   {driverProfile.name && (
                     <div className="driver-info">
                       <h6>Driver Info:</h6>
@@ -121,7 +134,22 @@ function MapComponent({ vehicleData = [] }) {
           );
         })}
 
-        {/* Zoom controls */}
+
+        {/* Display Directions if a vehicle is selected */}
+        {selectedVehicle && (
+          <RoutingMachine
+            waypoints={[
+              L.latLng(selectedVehicle.lat, selectedVehicle.lng),
+              L.latLng(officeLocation.lat, officeLocation.lng),
+            ]}
+            lineOptions={{
+              styles: [{ color: 'blue', weight: 4 }],
+            }}
+            fitSelectedRoutes={true}
+            show={true}
+          />
+        )}
+
         <ZoomControl position="bottomright" />
       </MapContainer>
     </div>

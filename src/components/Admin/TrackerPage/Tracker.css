@@ -2,17 +2,19 @@
 .tracker-container {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
 .main-content {
   flex-grow: 1;
   padding: 20px;
-  overflow-y: auto;
   background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
+/* Vehicle Map Container */
 .vehicle-map-container {
   display: flex;
   flex-direction: row;
@@ -20,14 +22,17 @@
   margin-top: 20px;
 }
 
+/* Vehicle Map Styles */
 .vehicle-map {
   flex-grow: 1;
   height: 70vh;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Map Placeholder */
 .map-placeholder {
   display: none; /* Only show this placeholder when there is no map component */
   background-color: white;
@@ -37,25 +42,7 @@
   flex: 1;
 }
 
-.vehicle-map-container .vehicle-map:hover .map-placeholder {
-  display: block;
-}
-
-.spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Sidebar */
+/* Sidebar Styles */
 .sidebar {
   width: 250px;
   background-color: #343a40;
@@ -63,6 +50,9 @@
   padding-top: 20px;
   height: 100vh;
   position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .sidebar .logo {
@@ -100,7 +90,7 @@
   background-color: #495057;
 }
 
-/* Navbar */
+/* Navbar Styles */
 .navbar {
   background-color: #ffffff;
   padding: 10px 20px;
@@ -156,7 +146,22 @@
   color: #333;
 }
 
-/* Media Queries */
+/* Spinner for loading state */
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Styles */
 @media (max-width: 768px) {
   .tracker-container {
     flex-direction: column;
