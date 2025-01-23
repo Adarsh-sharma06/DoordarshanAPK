@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import "./Styles/global.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Analytics } from "@vercel/analytics/react"
 import Login from "./components/Login/Login";
 import Tracker from "./components/Admin/TrackerPage/Tracker";
 import Dashboard from "./components/Admin/Dashboard/Dashboard";

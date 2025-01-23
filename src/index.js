@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import App from './App';
 import { setPersistence, browserSessionPersistence } from "firebase/auth";
 import { auth } from "./service/firebase";  // Adjust the path if needed
-import { Analytics } from "@vercel/analytics/react"
 import { AuthProvider } from './context/AuthContext';
 
 // Set Firebase Auth Persistence
@@ -21,7 +20,6 @@ root.render(
   <React.StrictMode>
     <AuthProvider>
       <App />
-      <Analytics  />
     </AuthProvider>
   </React.StrictMode>
 );
