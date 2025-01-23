@@ -1,0 +1,93 @@
+/* General Styles */
+.Status-tabs {
+  width: 70%;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.tab-headers {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
+}
+
+.tab-header {
+  flex: 1;
+  text-align: center;
+  border-radius: 4%;
+  padding: 30px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  border: 2px solid grey;
+  transition: border-color 0.3s, background-color 0.3s;
+  margin-right: 20px;
+  margin-bottom: 10px; /* Ensure spacing when tabs wrap */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tab-header:last-child {
+  margin-right: 0;
+}
+
+.tab-heading {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.tab-content {
+  font-size: 25px;
+  margin-top: 10px; /* Space between heading and content */
+}
+
+/* Responsive for Tablets (Width: 992px and below) */
+@media (max-width: 992px) {
+  .Status-tabs {
+    max-width: 90%; 
+  }
+
+  .tab-headers {
+    flex-wrap: wrap; /* Tabs should wrap on smaller screens */
+  }
+
+  .tab-header {
+    flex: 1 1 calc(50% - 20px); /* Two tabs per row */
+    margin-right: 10px; /* Decrease space between tabs */
+    padding: 25px 15px;
+    font-size: 16px;
+  }
+
+  .tab-heading {
+    font-size: 13px;
+  }
+
+  .tab-content {
+    font-size: 22px;
+  }
+}
+
+/* Responsive for Mobile Phones (Width: 768px and below) */
+@media (max-width: 768px) {
+  .Status-tabs {
+    width: 100%; 
+    margin: auto;
+  }
+
+  .tab-header {
+    width: 100%; 
+    padding: 20px;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  .tab-heading {
+    font-size: 12px;
+  }
+
+  .tab-content {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,68 @@
+/* Print styling */
+@media print {
+    /* Hide non-relevant content for printing */
+    .container-fluid, .row, .navbar, .sidebar, .status-tab, .btn {
+      display: none !important;
+    }
+  
+    #report-content {
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+    }
+  
+    /* Style the table for printing */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+  
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+  
+    th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+  
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  
+    /* Make table headers stand out */
+    th {
+      color: #343a40;
+    }
+  
+    /* Remove page break after the table */
+    body {
+      margin: 20px;
+    }
+  
+    /* Adjust text size for printing */
+    h4 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+  
+    /* Add space at the top of the page */
+    @page {
+      margin-top: 20mm;
+    }
+  
+    /* Ensure that large tables fit on the page */
+    table {
+      page-break-inside: avoid;
+      table-layout: fixed;
+    }
+  
+    /* Fine-tune table text size and fit */
+    td, th {
+      font-size: 12px;
+    }
+  }
+  

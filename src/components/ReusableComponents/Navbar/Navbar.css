@@ -1,0 +1,178 @@
+/* Navbar Container */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+/* Left Section: Brand */
+.navbar-left h1 {
+  font-size: 24px;
+  margin: 0;
+  color: #333;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Center Section: Search */
+.navbar-center {
+  flex: 1; /* Take up available space */
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-center form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 400px; /* Set max width for larger screens */
+}
+
+.search-input {
+  flex: 1; /* Take up available space */
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px; /* Rounded corners for left side */
+  font-size: 16px;
+}
+
+.search-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 0 4px 4px 0; /* Rounded corners for right side */
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button i {
+  font-size: 18px;
+}
+
+/* Right Section: Profile */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover; /* Ensures image fits properly */
+}
+
+.profile span {
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  display: none; /* Hidden by default */
+}
+
+.dropdown-menu.active {
+  display: block; /* Show when active */
+}
+
+/* Responsive Styles */
+
+/* Tablet and Small Screens (<= 768px) */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px 20px;
+  }
+
+  .navbar-left h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .navbar-center {
+    order: 3; /* Move search bar to the bottom */
+    width: 100%;
+  }
+
+  .navbar-center form {
+    margin-bottom: 10px;
+  }
+
+  .search-input {
+    flex: 1;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .search-button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .navbar-right {
+    order: 2;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .profile {
+    flex: 1;
+    justify-content: space-between;
+  }
+}
+
+/* Extra Small Screens (<= 480px) */
+@media (max-width: 480px) {
+  .navbar-left h1 {
+    font-size: 18px;
+  }
+
+  .search-input {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .search-button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .profile span {
+    display: none; /* Hide profile text to save space */
+  }
+
+  .navbar-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

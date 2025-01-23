@@ -1,0 +1,187 @@
+/* General Dashboard Layout */
+.dashboard-container {
+  display: flex;
+  flex-direction: row; /* Default: Sidebar and content side by side */
+  height: 100vh; /* Full viewport height */
+  overflow: hidden;
+}
+
+/* Sidebar Styling */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px; /* Sidebar width for larger screens */
+  height: 100%;
+  background-color: #f8f9fa;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  z-index: 10; /* Ensure it stays above other content */
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-container.hidden {
+  transform: translateX(-100%); /* Sidebar hidden off-screen */
+}
+
+.sidebar-container.active {
+  transform: translateX(0); /* Sidebar visible */
+}
+
+/* Content Styling */
+.content-container {
+  margin-left: 250px; /* Sidebar width */
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Status Cards */
+.status-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between; /* Ensure even distribution */
+}
+
+.status-card {
+  flex: 1;
+  min-width: 200px;
+  padding: 20px;
+  border-radius: 8px;
+  color: #fff;
+  text-align: center;
+  background-color: #007bff; /* Default background color */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Table Styling */
+.table-responsive {
+  max-width: 100%;
+  overflow-x: auto; /* Horizontal scrolling for overflow */
+}
+
+/* Booking Details Section */
+.booking-details {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+/* Loading Spinner */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.spinner {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Responsive Adjustments */
+
+/* Mobile Screens (<= 768px) */
+@media (max-width: 768px) {
+  /* Sidebar for Mobile Screens */
+  .sidebar-container {
+    width: 80%; /* Sidebar takes up 80% on mobile */
+    transform: translateX(-100%); /* Hidden by default */
+  }
+
+  .sidebar-container.active {
+    transform: translateX(0); /* Show sidebar */
+  }
+
+  /* Content for Mobile Screens */
+  .content-container {
+    margin-left: 0; /* No margin for mobile */
+    padding: 15px; /* Adjust padding for mobile */
+  }
+
+  /* Dashboard Container */
+  .dashboard-container {
+    flex-direction: column; /* Stack sidebar and content vertically on mobile */
+  }
+
+  /* Status Cards for Mobile */
+  .status-cards-container {
+    flex-direction: column; /* Stack cards vertically */
+  }
+
+  .status-card {
+    min-width: 100%; /* Full width for cards on mobile */
+    margin-bottom: 15px; /* Reduce space between cards */
+  }
+
+  /* Loading Spinner Adjustments */
+  .loading-container {
+    padding: 15px;
+  }
+}
+
+/* Tablet Screens (<= 992px) */
+@media (max-width: 992px) {
+  /* Adjust Sidebar and Content for Tablet Screens */
+  .sidebar-container {
+    width: 220px; /* Slightly narrower sidebar for tablets */
+  }
+
+  .content-container {
+    margin-left: 220px; /* Adjust content margin for tablet */
+  }
+
+  /* Status Cards for Tablets */
+  .status-cards-container {
+    gap: 15px; /* Reduce gap between cards */
+  }
+
+  .status-card {
+    min-width: 220px; /* Set min-width for cards on tablets */
+  }
+
+  /* Booking Details Section */
+  .booking-details {
+    padding: 15px; /* Slightly smaller padding on tablets */
+  }
+}
+
+/* Extra Small Screens (<= 576px) */
+@media (max-width: 576px) {
+  /* Sidebar Adjustments */
+  .sidebar-container {
+    width: 100%; /* Full width for sidebar */
+    transform: translateX(-100%); /* Hidden by default */
+  }
+
+  .sidebar-container.active {
+    transform: translateX(0); /* Show sidebar */
+  }
+
+  /* Content Adjustments */
+  .content-container {
+    margin-left: 0; /* No margin for mobile */
+    padding: 10px; /* Compact padding for small screens */
+  }
+
+  /* Status Cards Adjustments */
+  .status-cards-container {
+    gap: 10px; /* Reduce gap between cards */
+  }
+
+  .status-card {
+    min-width: 100%; /* Full width for cards on small screens */
+    padding: 15px; /* Compact padding */
+  }
+
+  /* Booking Details Section */
+  .booking-details {
+    padding: 10px; /* Compact padding on small screens */
+  }
+}
