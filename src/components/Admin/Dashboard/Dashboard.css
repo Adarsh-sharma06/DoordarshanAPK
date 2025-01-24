@@ -41,8 +41,9 @@
 .status-cards-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  justify-content: space-between; /* Ensure even distribution */
+  margin-left: 28px;
+  gap: 100px;
+  /* justify-content: space-between; Ensure even distribution */
 }
 
 .status-card {

@@ -212,9 +212,9 @@ function Dashboard() {
           userEmail={userData?.email}
         />
 
-        <div className="status-cards-container row mt-5">
+        <div className="status-cards-container row mt-4">
           {tabsData.map((tab, index) => (
-            <div key={index} className="col-12 col-md-4 mb-3">
+            <div key={index} className="col-12 col-md-3 mb-3">
               <div className="status-card text-center p-3" style={{ backgroundColor: tab.color }}>
                 {tab.icon}
                 <h5 className="mt-3">{tab.heading}</h5>
