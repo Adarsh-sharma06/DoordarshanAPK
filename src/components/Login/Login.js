@@ -114,9 +114,10 @@ function Login() {
               Remember Me
             </label>
 
-            <a href="/forgot-password" className="forgot-password my-3">
+            <a href="/ForgotPassword" className="forgot-password my-3">
               Forgot Password?
             </a>
+
           </div>
           <button className="Login-button mx-auto my-5">Login</button>
 

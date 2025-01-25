@@ -1,68 +1,188 @@
-/* Print styling */
+/* Global Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #e1dcd7; /* Background color */
+  color: #333;
+  margin: 0;
+}
+
+.container-fluid {
+  padding: 30px;
+}
+
+h4 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.select-control,
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.table {
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+  background-color: #f0f3f6;
+  color: #eb6c0a; /* Updated header color */
+  font-weight: 600;
+}
+
+.table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f1f5ff;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #eb6c0a; /* Updated navbar color */
+  color: white;
+  padding: 15px 20px;
+}
+
+.navbar .title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Filter Section */
+.d-flex {
+  gap: 10px;
+}
+
+.w-30 {
+  width: 30%;
+}
+
+.mb-4 {
+  margin-bottom: 30px;
+}
+
+/* Button */
+.btn {
+  background-color: #eb6c0a; /* Updated button color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #df5c08; /* Darker shade on hover */
+}
+
+/* Print Styling */
 @media print {
-    /* Hide non-relevant content for printing */
-    .container-fluid, .row, .navbar, .sidebar, .status-tab, .btn {
-      display: none !important;
-    }
-  
-    #report-content {
-      display: block;
-      margin: 0 auto;
-      width: 100%;
-    }
-  
-    /* Style the table for printing */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-  
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-  
-    th {
-      background-color: #f8f9fa;
-      font-weight: bold;
-    }
-  
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-  
-    /* Make table headers stand out */
-    th {
-      color: #343a40;
-    }
-  
-    /* Remove page break after the table */
-    body {
-      margin: 20px;
-    }
-  
-    /* Adjust text size for printing */
-    h4 {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-  
-    /* Add space at the top of the page */
-    @page {
-      margin-top: 20mm;
-    }
-  
-    /* Ensure that large tables fit on the page */
-    table {
-      page-break-inside: avoid;
-      table-layout: fixed;
-    }
-  
-    /* Fine-tune table text size and fit */
-    td, th {
-      font-size: 12px;
-    }
+  body {
+    font-size: 12px;
+    margin: 20px;
   }
-  
+
+  .container-fluid,
+  .navbar,
+  .sidebar,
+  .status-tab,
+  .btn {
+    display: none !important;
+  }
+
+  #report-content {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  th {
+    color: #343a40;
+  }
+
+  h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  @page {
+    margin-top: 20mm;
+  }
+
+  table {
+    page-break-inside: avoid;
+    table-layout: fixed;
+  }
+
+  td,
+  th {
+    font-size: 12px;
+  }
+}
+
+/* Table Alternating Row Color */
+.table tbody tr:nth-child(odd) {
+  background-color: #ebcfb5; /* Light background for odd rows */
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #e79f5d; /* Darker background for even rows */
+}
+
+
+.rounded-container {
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  padding: 20px;
+  background-color: #fff;
+}
+
+
+/* Custom styling for Total Km Moved tab */
+.totakKM {
+  background-color: #df5c08 !important;
+  color: white !important;
+}
+
+/* Additional optional styling to make text white for other elements within the tab */
+.total-km-tab .tab-heading {
+  color: white !important;
+}

@@ -1,7 +1,27 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, addDoc, getDoc, collection, getDocs, query, where, updateDoc, deleteDoc } from 'firebase/firestore';  // Firestore
-import { getDatabase, ref, onChildAdded, onChildChanged } from 'firebase/database'; // Realtime Database
+import { initializeApp } from "firebase/app";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  sendPasswordResetEmail // Added this for password reset functionality
+} from "firebase/auth";
+import { 
+  getFirestore, 
+  doc, 
+  addDoc, 
+  getDoc, 
+  collection, 
+  getDocs, 
+  query, 
+  where, 
+  updateDoc, 
+  deleteDoc 
+} from "firebase/firestore"; // Firestore
+import { 
+  getDatabase, 
+  ref, 
+  onChildAdded, 
+  onChildChanged 
+} from "firebase/database"; // Realtime Database
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -19,9 +39,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Firebase instances
-const auth = getAuth(app);  // Firebase Auth
-const db = getFirestore(app);  // Firestore instance
-const database = getDatabase(app);  // Realtime Database instance
+const auth = getAuth(app); // Firebase Auth
+const db = getFirestore(app); // Firestore instance
+const database = getDatabase(app); // Realtime Database instance
 const storage = getStorage(app); // Initialize Firebase Storage
 
 export {
@@ -31,6 +51,7 @@ export {
   addDoc,
   database,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail, // Export this function
   doc,
   getDoc,
   collection,
@@ -41,5 +62,5 @@ export {
   deleteDoc,
   ref,
   onChildAdded,
-  onChildChanged
+  onChildChanged,
 };

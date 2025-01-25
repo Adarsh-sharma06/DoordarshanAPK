@@ -4,6 +4,7 @@ import "./Styles/global.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Login from "./components/Login/Login";
+import ForgotPassword from "./components/Login/ForgetPassword/forgetPassword";
 import Tracker from "./components/Admin/TrackerPage/Tracker";
 import Dashboard from "./components/Admin/Dashboard/Dashboard";
 import Report from "./components/Admin/Reports/Report";
@@ -15,20 +16,21 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./components/ReusableComponents/Profile/Profile";
 import { auth } from "./service/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState(null); // Track user role (Admin/Reporter)
+  const [userRole, setUserRole] = useState(null);
+
+  const db = getFirestore();
 
   // Check for user authentication status on app load
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
+        const role = await fetchUserRole(currentUser.email); // Use UID for better security
         setUser(currentUser);
-
-        // Fetch user role from database
-        const role = await fetchUserRole(currentUser.email); // Replace with your role-fetching logic
         setUserRole(role);
       } else {
         setUser(null);
@@ -37,22 +39,32 @@ function App() {
       setLoading(false); // Stop loading when auth check completes
     });
 
-    return () => unsubscribe(); // Cleanup listener
+    return unsubscribe; // Cleanup listener
   }, []);
 
-  // Mock function to fetch user role
+  // Fetch user role from Firestore
   const fetchUserRole = async (email) => {
-    // Replace this with actual logic to fetch role from your Firebase database
-    // For example, querying the "users" collection to find the role field
-    if (email === "admin@example.com") return "Admin";
-    if (email === "reporter@example.com") return "Reporter";
-    return null;
+    try {
+      const userDocRef = doc(db, "users", email); // Secure: Use UID instead of email as Firestore key
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const { role } = userDoc.data();
+        if (!role) throw new Error("User role not defined in Firestore");
+        return role;
+      } else {
+        throw new Error("User document not found");
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error.message);
+      return null;
+    }
   };
 
-  // If still loading, show a loader
+  // Render loader while authentication state is being checked
   if (loading) {
     return (
-      <div className="loading-container" style={{ textAlign: "center", marginTop: "100px" }}>
+      <div className="loading-container text-center mt-5">
         <h3>Loading...</h3>
       </div>
     );
@@ -77,11 +89,16 @@ function App() {
           }
         />
 
+        <Route
+          path="/ForgotPassword"
+          element={<ForgotPassword />}
+        />
+
         {/* Admin Routes */}
         <Route
           path="/Admin/Dashboard"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Admin">
               <Dashboard />
             </ProtectedRoute>
           }
@@ -89,7 +106,7 @@ function App() {
         <Route
           path="/Admin/Dashboard/CreateUser"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Admin">
               <AddUserForm />
             </ProtectedRoute>
           }
@@ -97,7 +114,7 @@ function App() {
         <Route
           path="/Admin/Tracker"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Admin">
               <Tracker />
             </ProtectedRoute>
           }
@@ -105,7 +122,7 @@ function App() {
         <Route
           path="/Admin/Reports/Report"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Admin">
               <Report />
             </ProtectedRoute>
           }
@@ -115,7 +132,7 @@ function App() {
         <Route
           path="/Reporter/ReporterDashboard"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Reporter">
               <ReporterDashboard />
             </ProtectedRoute>
           }
@@ -123,7 +140,7 @@ function App() {
         <Route
           path="/Reporter/CarRequest"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Reporter">
               <CarRequest />
             </ProtectedRoute>
           }
@@ -131,7 +148,7 @@ function App() {
         <Route
           path="/Profile"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole}>
               <Profile />
             </ProtectedRoute>
           }
@@ -139,7 +156,7 @@ function App() {
         <Route
           path="/Reporter/reports"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} role={userRole} allowedRole="Reporter">
               <RReport />
             </ProtectedRoute>
           }

@@ -135,7 +135,7 @@ function Tracker() {
   return (
     <div className="tracker-container">
       {/* Sidebar */}
-      <Sidebar logoSrc="/images/DD.png" logoText="Doordarshan" menuSections={menuSections} />
+      <Sidebar logoSrc="/images/DD.png" logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
       <div className="main-content">
         {/* Navbar */}
