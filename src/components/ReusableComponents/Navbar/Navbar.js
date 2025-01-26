@@ -40,8 +40,9 @@ const Navbar = ({ title, userEmail }) => {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
+        
         // Redirect to the login page after logging out
-        navigate("/Login");
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error logging out:", error);
