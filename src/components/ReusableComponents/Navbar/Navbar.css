@@ -67,6 +67,10 @@
   flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
+.profile-dropdown{
+  left: unset  !important;
+}
+
 .profile {
   display: flex;
   align-items: center;
@@ -102,6 +106,8 @@
 .dropdown-menu.active {
   display: block; /* Show when active */
 }
+
+
 
 /* Responsive Styles */
 

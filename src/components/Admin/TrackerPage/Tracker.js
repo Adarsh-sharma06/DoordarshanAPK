@@ -14,19 +14,17 @@ function Tracker() {
 
   const menuSections = [
     {
-      heading: null,
+      heading: "Main Menu",
       items: [
-        { name: 'Dashboard', link: '/Admin/Dashboard', icon: 'bi bi-speedometer2' },
-        { name: 'Tracker', link: '/Admin/Tracker', icon: 'bi bi-map' },
-        { name: 'Report', link: '/Admin/Report', icon: 'bi bi-bar-chart' },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
+        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
+        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
       ],
     },
     {
-      heading: 'Administrator',
+      heading: "Administration",
       items: [
-        { name: 'Vehicles', link: '/vehicles', icon: 'bi bi-truck' },
-        { name: 'Users', link: '/Admin/Dashboard/CreateUser', icon: 'bi bi-people' },  // Updated link
-        { name: 'Driver', link: '/driver', icon: 'bi bi-person-badge' },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
       ],
     },
   ];
@@ -135,16 +133,16 @@ function Tracker() {
   return (
     <div className="tracker-container">
       {/* Sidebar */}
-      <Sidebar logoSrc="/images/DD.png" logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
+      <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
-      <div className="main-content">
+      <div className="tracker-content">
         {/* Navbar */}
         <Navbar
-          title="Tracker"
-          placeholder="Search for something..."
-          profileImg={userData?.profileImage || "/images/DD.png"}
-          profileName={userData?.name || "Admin"}
-        />
+                  title="Tracker"
+                  profileImg={userData?.profileImage || "/images/DD.png"}
+                  profileName={userData?.name || "Admin"}
+                  userEmail={userData?.email}
+                />
 
         {/* Map and Vehicle Data */}
         <div className="vehicle-map-container mt-5">

@@ -87,17 +87,13 @@ const Navbar = ({ title, userEmail }) => {
             >
               <i className="bi bi-three-dots-vertical"></i>
             </button>
-            <ul className="dropdown-menu" aria-labelledby="profileMenu">
+            <ul className="dropdown-menu profile-dropdown " aria-labelledby="profileMenu">
               <li>
                 <button className="dropdown-item" onClick={handleProfileClick}>
                   View Profile
                 </button>
               </li>
-              <li>
-                <button className="dropdown-item" onClick={handleSettingsClick}>
-                  Settings
-                </button>
-              </li>
+             
               <li>
                 <button className="dropdown-item text-danger" onClick={handleLogout}>
                   Logout

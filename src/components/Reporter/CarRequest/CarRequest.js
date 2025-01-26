@@ -155,11 +155,27 @@ function CarRequest() {
   };
 
   return (
-    <>
-      <Navbar title="Reporter Dashboard" userEmail={currentUser?.email || ""} />
-      <Sidebar menuSections={menuSections} />
+    <div className="d-flex">
+       <Sidebar
+                menuSections={[
+                    {
+                        heading: null,
+                        items: [
+                            { name: "Dashboard", link: "/Reporter/ReporterDashboard", icon: "bi bi-house-door" },
+                            { name: "Reports", link: "/Reporter/reports", icon: "bi bi-file-earmark-text" },
+                            // { name: "History", link: "/Reporter/History", icon: "bi bi-clock" },
+                            { name: "Car Request", link: "/Reporter/CarRequest", icon: "bi bi-car-front" },
+                        ],
+                    },
+                    { heading: "Settings", items: [{ name: "Profile", link: "/Profile", icon: "bi bi-person" }] },
+                ]}
+                showLogout={true}
+            />
 
+<div className="main-content flex-grow-1">
+                <Navbar title="Reporter Dashboard" userEmail={currentUser?.email || "Guest"} />
       <div className="container py-5">
+        
         <Paper
           elevation={4}
           sx={{
@@ -269,7 +285,8 @@ function CarRequest() {
           </form>
         </Paper>
       </div>
-    </>
+      </div>
+    </div>
   );
 }
 

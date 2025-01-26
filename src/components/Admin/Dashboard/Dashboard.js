@@ -17,9 +17,7 @@ import {
   FaTrashAlt,
   FaCheck,
   FaTimes,
-  FaTruck,
-  FaMapMarkerAlt,
-  FaUsers,
+  
   FaClipboardList,
 } from "react-icons/fa";
 import { Modal, Button, Form } from "react-bootstrap";
@@ -29,17 +27,15 @@ function Dashboard() {
     {
       heading: "Main Menu",
       items: [
-        { name: "Dashboard", link: "/Admin/Dashboard", icon: <FaClipboardList /> },
-        { name: "Tracker", link: "/Admin/Tracker", icon: <FaMapMarkerAlt /> },
-        { name: "Reports", link: "/Admin/Reports/Report", icon: <FaTruck /> },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
+        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
+        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
       ],
     },
     {
       heading: "Administration",
       items: [
-        { name: "Vehicles", link: "/vehicles", icon: <FaTruck /> },
-        { name: "Users", link: "/Admin/Dashboard/CreateUser", icon: <FaUsers /> },
-        { name: "Drivers", link: "/driver", icon: <FaUsers /> },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
       ],
     },
   ];
@@ -200,8 +196,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container container-fluid">
-      <Sidebar logoSrc="/images/DD.png" logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
+    <div className="dashboard-container ">
+      <Sidebar  logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
       <div className="content-container">
         <Navbar
@@ -224,7 +220,7 @@ function Dashboard() {
           ))}
         </div>
 
-        <div className="booking-details mt-5">
+        <div className="booking-details container-fluid mt-5">
           <h4>Booking Details</h4>
           <div className="table-responsive">
             <table className="table table-striped table-hover">

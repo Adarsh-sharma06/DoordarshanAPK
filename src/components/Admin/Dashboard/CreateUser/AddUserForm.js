@@ -89,19 +89,17 @@ const AddUserForm = () => {
   // Sidebar menu sections
   const menuSections = [
     {
-      heading: null,
+      heading: "Main Menu",
       items: [
-        { name: "Dashboard", link: "/Admin/Dashboard", icon: "bi bi-speedometer2" },
-        { name: "Tracker", link: "/Admin/Tracker", icon: "bi bi-map" },
-        { name: "Report", link: "/Admin/Report", icon: "bi bi-bar-chart" },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
+        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
+        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
       ],
     },
     {
-      heading: "Administrator",
+      heading: "Administration",
       items: [
-        { name: "Vehicles", link: "/vehicles", icon: "bi bi-truck" },
-        { name: "Users", link: "/Admin/Dashboard/CreateUser", icon: "bi bi-people" },
-        { name: "Driver", link: "/driver", icon: "bi bi-person-badge" },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
       ],
     },
   ];
@@ -109,7 +107,7 @@ const AddUserForm = () => {
   return (
     <div style={{ display: "flex" }}>
       {/* Sidebar */}
-      <Sidebar logoSrc="/images/DD.png" logoText="Doordarshan" menuSections={menuSections} />
+      <Sidebar  logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
       {/* Main content */}
       <div style={{ flex: 1, paddingLeft: "220px" }}>
@@ -119,6 +117,14 @@ const AddUserForm = () => {
           profileImg="/images/DD.png"
           profileName="Admin" // Adjust as needed
         />
+
+        {/* <Navbar
+                  title="Admin Dashboard"
+                  placeholder="Search for something..."
+                  profileImg={userData?.profileImage || "/images/DD.png"}
+                  profileName={userData?.name || "Admin"}
+                  userEmail={userData?.email}
+                /> */}
 
         <Box
           component="form"

@@ -12,17 +12,15 @@ function Report() {
     {
       heading: "Main Menu",
       items: [
-        { name: "Dashboard", link: "/Admin/Dashboard", icon: <FaClipboardList /> },
-        { name: "Tracker", link: "/Admin/Tracker", icon: <FaMapMarkerAlt /> },
-        { name: "Reports", link: "/Admin/Reports/Report", icon: <FaTruck /> },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
+        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
+        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
       ],
     },
     {
       heading: "Administration",
       items: [
-        { name: "Vehicles", link: "/vehicles", icon: <FaTruck /> },
-        { name: "Users", link: "/Admin/Dashboard/CreateUser", icon: <FaUsers /> },
-        { name: "Drivers", link: "/driver", icon: <FaUsers /> },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
       ],
     },
   ];
@@ -162,17 +160,26 @@ function Report() {
       <div className="row">
         {/* Sidebar */}
         <div className="col-12 col-md-3">
-          <Sidebar logoSrc="/images/DD.png" logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
+          <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
         </div>
 
         {/* Main Content */}
         <div className="col-12 col-md-9 ms-auto">
+
           <Navbar
             title="Report"
             placeholder="Search for something..."
             profileImg="/images/DD.png"
             profileName="Admin"
           />
+
+          {/* <Navbar
+          title="Admin Dashboard"
+          placeholder="Search for something..."
+          profileImg={userData?.profileImage || "/images/DD.png"}
+          profileName={userData?.name || "Admin"}
+          userEmail={userData?.email}
+        /> */}
 
           <div className="mt-4">
             <StatusTab

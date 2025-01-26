@@ -44,9 +44,9 @@
   /* Adjust Logo */
   .logo {
     font-size: 18px;
-    padding: 15px;
+    /* padding: 15px;
     display: flex;
-    align-items: center;
+    align-items: center; */
     gap: 10px;
   }
 
@@ -92,14 +92,14 @@
 .logo {
   font-size: 80px;
   padding: 15px;
-  display: flex;
-  align-items: center;
+  /* display: flex;
+  align-items: center; */
   gap: 10px;
 }
 
 .logo-img {
-  width: 180px;
-  height: 180px;
+  width: 100px;
+  height: 100px;
 }
 
 /* Menu Styling */
@@ -136,7 +136,7 @@
 .main-content {
   margin-left: 250px;
   /* Offset content for sidebar */
-  padding: 20px;
+  /* padding: 20px; */
 }
 
 /* Responsive Adjustments for Tablets and Small Screens */

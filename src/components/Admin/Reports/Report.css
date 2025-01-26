@@ -1,14 +1,5 @@
 /* Global Styles */
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #e1dcd7; /* Background color */
-  color: #333;
-  margin: 0;
-}
 
-.container-fluid {
-  padding: 30px;
-}
 
 h4 {
   font-size: 20px;
@@ -50,46 +41,8 @@ h4 {
   overflow-x: auto;
 }
 
-/* Navbar */
-.navbar {
-  background-color: #eb6c0a; /* Updated navbar color */
-  color: white;
-  padding: 15px 20px;
-}
-
-.navbar .title {
-  font-size: 24px;
-  font-weight: 700;
-}
-
-/* Filter Section */
-.d-flex {
-  gap: 10px;
-}
-
-.w-30 {
-  width: 30%;
-}
-
-.mb-4 {
-  margin-bottom: 30px;
-}
-
 /* Button */
-.btn {
-  background-color: #eb6c0a; /* Updated button color */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 15px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
 
-.btn:hover {
-  background-color: #df5c08; /* Darker shade on hover */
-}
 
 /* Print Styling */
 @media print {
