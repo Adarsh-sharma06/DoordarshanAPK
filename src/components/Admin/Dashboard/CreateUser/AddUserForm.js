@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, Box, Typography } from "@mui/material";
 import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "../../../../service/firebase"; // Adjust the path as needed
 import Sidebar from "../../../ReusableComponents/Sidebar/Sidebar"; // Adjust the path as needed
 import Navbar from "../../../ReusableComponents/Navbar/Navbar"; // Adjust the path as needed
+import { onAuthStateChanged } from "firebase/auth"; // To track auth state
 
 const AddUserForm = () => {
   const [formData, setFormData] = useState({
@@ -18,11 +19,25 @@ const AddUserForm = () => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [userEmail, setUserEmail] = useState(""); // State to track logged-in user's email
+
+  // Track the logged-in user's email
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(""); // Clear error message on input change
+    setSuccess(""); // Clear success message on input change
   };
 
   // Handle form submission
@@ -91,40 +106,27 @@ const AddUserForm = () => {
     {
       heading: "Main Menu",
       items: [
-        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
-        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
-        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: "bi bi-speedometer2" },
+        { name: "Tracker", link: "/Admin/Tracker", icon: "bi bi-map" },
+        { name: "Reports", link: "/Admin/Reports/Report", icon: "bi bi-bar-chart" },
       ],
     },
     {
       heading: "Administration",
       items: [
-        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: "bi bi-people" },
       ],
     },
   ];
 
   return (
-    <div style={{ display: "flex" }}>
+    <div className="Reports-container">
       {/* Sidebar */}
-      <Sidebar  logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
+      <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
-      {/* Main content */}
-      <div style={{ flex: 1, paddingLeft: "220px" }}>
-        <Navbar
-          title="Add User"
-          placeholder="Search for something..."
-          profileImg="/images/DD.png"
-          profileName="Admin" // Adjust as needed
-        />
-
-        {/* <Navbar
-                  title="Admin Dashboard"
-                  placeholder="Search for something..."
-                  profileImg={userData?.profileImage || "/images/DD.png"}
-                  profileName={userData?.name || "Admin"}
-                  userEmail={userData?.email}
-                /> */}
+      {/* Main Content */}
+      <div className="Reports-content">
+        <Navbar title="Add User" userEmail={userEmail} />
 
         <Box
           component="form"
@@ -146,6 +148,7 @@ const AddUserForm = () => {
             Add User
           </Typography>
 
+          {/* Error and Success Messages */}
           {error && (
             <Typography color="error" textAlign="center">
               {error}

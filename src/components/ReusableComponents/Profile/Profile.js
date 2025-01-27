@@ -1,3 +1,4 @@
+// Profile.js
 import React, { useState, useEffect } from "react";
 import { db, doc, getDoc, updateDoc } from "../../../service/firebase";
 import { getAuth } from "firebase/auth";
@@ -29,6 +30,23 @@ const Profile = () => {
 
   const [activeTab, setActiveTab] = useState("profile");
 
+  const menuSections = [
+    {
+      heading: "Main Menu",
+      items: [
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: "bi bi-speedometer2" },
+        { name: "Tracker", link: "/Admin/Tracker", icon: "bi bi-map" },
+        { name: "Reports", link: "/Admin/Reports/Report", icon: "bi bi-bar-chart" },
+      ],
+    },
+    {
+      heading: "Administration",
+      items: [
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: "bi bi-people" },
+      ],
+    },
+  ];
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (currentUser) {
@@ -55,26 +73,16 @@ const Profile = () => {
     fetchUserData();
   }, [currentUser]);
 
-  // Handle Profile Update
-  const handleNameChange = (e) => {
-    setProfileName(e.target.value);
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setNewProfileImg(file);
-  };
-
+  const handleNameChange = (e) => setProfileName(e.target.value);
+  const handleFileChange = (e) => setNewProfileImg(e.target.files[0]);
+  
   const handleProfileUpdate = async () => {
     if (!profileName || !currentUser) return;
 
     setLoading(true);
-
     try {
       const userDocRef = doc(db, "users", currentUser.email);
-      await updateDoc(userDocRef, {
-        name: profileName,
-      });
+      await updateDoc(userDocRef, { name: profileName });
 
       if (newProfileImg) {
         const imageRef = ref(storage, `profileImages/${currentUser.email}`);
@@ -101,36 +109,22 @@ const Profile = () => {
     }
   };
 
-  // Handle Password Change
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
-    // Here, you would typically call Firebase Auth to update the password
     alert("Password updated successfully!");
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <div className="text-center">Loading...</div>;
 
   return (
     <div className="d-flex">
       {/* Sidebar */}
       <Sidebar
-        menuSections={[
-          {
-            heading: null,
-            items: [
-              { name: "Dashboard", link: "/Reporter/ReporterDashboard", icon: "bi bi-house-door" },
-              { name: "Reports", link: "/Reporter/reports", icon: "bi bi-file-earmark-text" },
-              { name: "Car Request", link: "/Reporter/CarRequest", icon: "bi bi-car-front" },
-            ],
-          },
-          { heading: "Settings", items: [{ name: "Profile", link: "/Reporter/Profile", icon: "bi bi-person" }] },
-        ]}
+        menuSections={menuSections}
         showLogout={true}
       />
       {/* Main Content */}
@@ -140,7 +134,6 @@ const Profile = () => {
 
         {/* Profile Page */}
         <div className="profile-page container">
-
           <Tabs
             activeKey={activeTab}
             onSelect={(k) => setActiveTab(k)}
@@ -262,7 +255,6 @@ const Profile = () => {
             </Tab>
           </Tabs>
         </div>
-
       </div>
     </div>
   );

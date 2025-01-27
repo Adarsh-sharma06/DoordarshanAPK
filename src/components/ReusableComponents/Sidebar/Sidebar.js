@@ -12,8 +12,14 @@ function Sidebar({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Toggle Sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Close Sidebar
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   const handleLogout = async () => {
@@ -38,14 +44,26 @@ function Sidebar({
 
       {/* Sidebar */}
       <div
-        className={`sidebar bg-light shadow-sm ${
-          isSidebarOpen ? "active" : ""
-        } d-md-block`}
+        className={`sidebar bg-light shadow-sm ${isSidebarOpen ? "active" : ""} d-md-block`}
       >
         {/* Logo Section */}
         <div className="logo text-center p-4">
-          <img src={logoSrc} alt="Logo" className="logo-img" aria-label="Logo" />
+          <img
+            src={logoSrc}
+            alt="Logo"
+            className="logo-img"
+            aria-label="Logo"
+          />
         </div>
+
+        {/* Close Button for Mobile */}
+        <button
+          className="close-btn d-md-none"
+          onClick={closeSidebar}
+          aria-label="Close Sidebar"
+        >
+          <i className="bi bi-x"></i>
+        </button>
 
         {/* Menu Section */}
         <ul className="menu list-unstyled w-100">
@@ -76,7 +94,7 @@ function Sidebar({
                 <li className="py-2 px-3 ">
                   <button
                     onClick={handleLogout}
-                    className="btn btn-link text-dark text-decoration-none d-flex align-items-center"
+                    className="btn btn-link text-dark text-decoration-none d-flex align-items-center redBtn"
                   >
                     <i className="bi bi-box-arrow-right me-2"></i> Logout
                   </button>

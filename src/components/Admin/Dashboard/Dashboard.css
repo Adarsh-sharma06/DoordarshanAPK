@@ -51,7 +51,7 @@
   min-width: 200px;
   padding: 20px;
   border-radius: 8px;
-  color: #fff;
+  color: #444;
   text-align: center;
   background-color: #007bff; /* Default background color */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -68,10 +68,15 @@
 .booking-details {
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-top: 20px;
+  padding: 0 20px 20px 20px;
 }
+
+.booking-details h4 {
+  color: #eb6c0a;
+  font-weight: bolder;
+  font-size: 32px;
+}
+
 
 /* Loading Spinner */
 .loading-container {
@@ -85,6 +90,17 @@
   font-size: 24px;
   font-weight: bold;
 }
+
+.orangeBtn{
+  background-color: #f99244 !important;
+  border-color: #f99244 !important;
+}
+
+.orangeBtn:hover{
+  background-color: #cd6321 !important;
+  border-color: #cd6321 !important;
+}
+
 
 /* Responsive Adjustments */
 
@@ -185,4 +201,21 @@
   .booking-details {
     padding: 10px; /* Compact padding on small screens */
   }
+}
+
+
+.btn-success {
+background-color: lightgreen;
+border-color: lightgreen;
+color: black;
+}
+.btn-warning {
+background-color: rgb(248, 248, 94);
+border-color: rgb(248, 248, 94);
+color: black;
+}
+.btn-danger {
+background-color: lightcoral;
+border-color: lightcoral;
+color: black;
 }

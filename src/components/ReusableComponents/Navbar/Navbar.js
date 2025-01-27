@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { doc, getDoc } from "firebase/firestore";
-import { db, auth } from "../../../service/firebase"; // Import auth
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { signOut } from "firebase/auth"; // Import signOut from Firebase
+import { db, auth } from "../../../service/firebase";
+import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
 import "./Navbar.css";
 
 const Navbar = ({ title, userEmail }) => {
   const [profileName, setProfileName] = useState("User");
   const [profileImg, setProfileImg] = useState("/images/default-profile.png");
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   // Fetch user data
   useEffect(() => {
@@ -40,9 +40,7 @@ const Navbar = ({ title, userEmail }) => {
     signOut(auth)
       .then(() => {
         console.log("User logged out");
-        
-        // Redirect to the login page after logging out
-        navigate("/");
+        navigate("/"); // Navigate to login page
       })
       .catch((error) => {
         console.error("Error logging out:", error);
@@ -55,17 +53,16 @@ const Navbar = ({ title, userEmail }) => {
     navigate("/Profile"); // Navigate to the profile page
   };
 
-  // Handle Settings click
-  const handleSettingsClick = () => {
-    console.log("Settings clicked");
-    // You can add settings click logic here
-  };
-
   return (
     <nav className="navbar">
       {/* Left Section: Title */}
       <div className="navbar-left">
         <h1>{title}</h1>
+      </div>
+
+      {/* Center Section: Search */}
+      <div className="navbar-center">
+        {/* You can make the search bar toggleable with a button if needed */}
       </div>
 
       {/* Right Section: Profile */}
@@ -75,29 +72,27 @@ const Navbar = ({ title, userEmail }) => {
             src={profileImg}
             alt="Profile"
             className="profile-img"
-            onClick={handleProfileClick} // Navigate to profile page
+            onClick={handleProfileClick}
           />
           <span>{profileName}</span>
           <div className="dropdown">
             <button
-              className="btn btn-sm btn-secondary dropdown-toggle"
+              className="btn btn-sm btn-secondary dropdown-toggle optionMenu"
               type="button"
-              id="profileMenu"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i className="bi bi-three-dots-vertical"></i>
+              {/* Removed dropdown arrow */}
             </button>
-            <ul className="dropdown-menu profile-dropdown " aria-labelledby="profileMenu">
+            <ul className="dropdown-menu profile-dropdown">
               <li>
                 <button className="dropdown-item" onClick={handleProfileClick}>
-                  View Profile
+                  <i className="bi bi-people-fill"></i> View Profile
                 </button>
               </li>
-             
               <li>
                 <button className="dropdown-item text-danger" onClick={handleLogout}>
-                  Logout
+                  <i className="bi bi-box-arrow-right me-2"></i> Logout
                 </button>
               </li>
             </ul>

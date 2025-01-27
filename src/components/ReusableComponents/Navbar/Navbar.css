@@ -67,14 +67,31 @@
   flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
-.profile-dropdown{
-  left: unset  !important;
+.profile-dropdown {
+  left: unset !important;
 }
 
 .profile {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.navbar .profile {
+  display: flex;
+  align-items: center;
+}
+
+.navbar .profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.navbar .profile span {
+  font-weight: bold;
+  color: #333;
 }
 
 .profile-img {
@@ -107,15 +124,26 @@
   display: block; /* Show when active */
 }
 
+/* Hamburger Menu for Small Screens */
+.hamburger-menu {
+  display: none; /* Hidden by default */
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
 
+.hamburger-menu div {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  border-radius: 3px;
+}
 
-/* Responsive Styles */
-
-/* Tablet and Small Screens (<= 768px) */
+/* Mobile Navigation: Show hamburger menu, hide elements */
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     padding: 15px 20px;
   }
 
@@ -127,6 +155,7 @@
   .navbar-center {
     order: 3; /* Move search bar to the bottom */
     width: 100%;
+    display: none; /* Hide search bar on mobile */
   }
 
   .navbar-center form {
@@ -147,16 +176,34 @@
   .navbar-right {
     order: 2;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start; /* Align items to the left */
+    gap: 10px;
   }
 
   .profile {
     flex: 1;
-    justify-content: space-between;
+    justify-content: flex-start;
+  }
+
+  .profile span {
+    display: none; /* Hide profile text to save space */
+  }
+
+  .navbar-right {
+    display: flex; /* Show the profile on mobile */
+    gap: 10px;
+  }
+
+  .hamburger-menu {
+    display: none; /* Removed the hamburger on mobile */
+  }
+
+  .profile-img {
+    width: 30px;
+    height: 30px;
   }
 }
 
-/* Extra Small Screens (<= 480px) */
 @media (max-width: 480px) {
   .navbar-left h1 {
     font-size: 18px;
@@ -181,4 +228,14 @@
     align-items: flex-start;
     gap: 10px;
   }
+}
+
+.optionMenu {
+  background-color: #f99244 !important;
+  border-color: #f99244 !important;
+}
+
+.optionMenu:hover {
+  background-color: #cd6321 !important;
+  border-color: #cd6321 !important;
 }

@@ -1,5 +1,16 @@
 /* Global Styles */
+.Reports-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: auto;
+}
 
+.Reports-content {
+  margin-left: 250px; /* Sidebar width */
+  flex: 1;
+  transition: margin-left 0.3s ease-in-out;
+}
 
 h4 {
   font-size: 20px;
@@ -41,8 +52,28 @@ h4 {
   overflow-x: auto;
 }
 
-/* Button */
+.print-btn{
+  background-color: #f99244;
+  border-color: #f99244;
+}
+.print-btn:hover{
+  background-color: #cd6321;
+  border-color: #cd6321;
+  color: #222;
+}
 
+
+.filter-dropdown select,
+.filter-dropdown input {
+  max-width: 120px;
+  margin-right: 10px;
+}
+
+.filter-dropdown {
+  display: inline-block;
+}
+
+/* Button */
 
 /* Print Styling */
 @media print {
@@ -120,22 +151,149 @@ h4 {
   background-color: #e79f5d; /* Darker background for even rows */
 }
 
-
 .rounded-container {
   border-radius: 10px;
-  border: 1px solid #ddd;
   padding: 20px;
   background-color: #fff;
 }
 
-
-/* Custom styling for Total Km Moved tab */
-.totakKM {
-  background-color: #df5c08 !important;
-  color: white !important;
+.totalKM {
+  font-size: 20px;
+  font-weight: 600;
+  background-color: red;
 }
 
-/* Additional optional styling to make text white for other elements within the tab */
-.total-km-tab .tab-heading {
-  color: white !important;
+/* Responsive Styling */
+@media (max-width: 1200px) {
+  .Reports-container {
+    flex-direction: column;
+  }
+
+  .Reports-content {
+    margin-left: 0;
+  }
+
+  .table th,
+  .table td {
+    font-size: 12px;
+  }
+
+  .select-control,
+  .form-control {
+    font-size: 12px;
+  }
+
+  .rounded-container {
+    padding: 15px;
+  }
+
+  .totalKM {
+    font-size: 18px;
+  }
+
+  /* Adjust table layout on smaller screens */
+  .table-responsive {
+    overflow-x: scroll;
+  }
+}
+
+@media (max-width: 768px) {
+  /* For smaller tablets and mobile devices */
+  .Reports-container {
+    flex-direction: column;
+  }
+
+  .Reports-content {
+    margin-left: 0;
+    padding: 10px;
+  }
+
+  .table th,
+  .table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .select-control,
+  .form-control {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  h4 {
+    font-size: 18px;
+  }
+
+  .rounded-container {
+    padding: 10px;
+  }
+
+  .totalKM {
+    font-size: 16px;
+    background-color: red;
+  }
+
+  /* Adjusting the filter section for smaller screens */
+  .filter-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-wrapper .w-30 {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .filter-wrapper .text-end {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  /* For very small mobile devices */
+  .Reports-container {
+    flex-direction: column;
+  }
+
+  .Reports-content {
+    margin-left: 0;
+  }
+
+  .table th,
+  .table td {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .select-control,
+  .form-control {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+
+  .rounded-container {
+    padding: 8px;
+  }
+
+  .totalKM {
+    font-size: 14px;
+    background-color: red;
+  }
+
+  .filter-wrapper {
+    flex-direction: column;
+  }
+
+  .filter-wrapper .w-30 {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .filter-wrapper .text-end {
+    text-align: left;
+  }
 }

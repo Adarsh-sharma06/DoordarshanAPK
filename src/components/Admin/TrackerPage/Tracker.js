@@ -16,15 +16,15 @@ function Tracker() {
     {
       heading: "Main Menu",
       items: [
-        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
-        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
-        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: "bi bi-speedometer2" },
+        { name: "Tracker", link: "/Admin/Tracker", icon: "bi bi-map" },
+        { name: "Reports", link: "/Admin/Reports/Report", icon: "bi bi-bar-chart" },
       ],
     },
     {
       heading: "Administration",
       items: [
-        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: "bi bi-people" },
       ],
     },
   ];

@@ -17,7 +17,6 @@ import {
   FaTrashAlt,
   FaCheck,
   FaTimes,
-  
   FaClipboardList,
 } from "react-icons/fa";
 import { Modal, Button, Form } from "react-bootstrap";
@@ -27,15 +26,15 @@ function Dashboard() {
     {
       heading: "Main Menu",
       items: [
-        { name: "Dashboard", link: "/Admin/Dashboard", icon: 'bi bi-truck' },
-        { name: "Tracker", link: "/Admin/Tracker", icon:'bi bi-map'},
-        { name: "Reports", link: "/Admin/Reports/Report", icon:'bi bi-bar-chart' },
+        { name: "Dashboard", link: "/Admin/Dashboard", icon: "bi bi-speedometer2" },
+        { name: "Tracker", link: "/Admin/Tracker", icon: "bi bi-map" },
+        { name: "Reports", link: "/Admin/Reports/Report", icon: "bi bi-bar-chart" },
       ],
     },
     {
       heading: "Administration",
       items: [
-        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: 'bi bi-people' },
+        { name: "Create Users", link: "/Admin/Dashboard/CreateUser", icon: "bi bi-people" },
       ],
     },
   ];
@@ -46,7 +45,9 @@ function Dashboard() {
   const [userNames, setUserNames] = useState({});
   const [showDriverModal, setShowDriverModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const [drivers, setDrivers] = useState([]);
   const [driverSelection, setDriverSelection] = useState(null);
 
@@ -163,6 +164,34 @@ function Dashboard() {
     setShowDeleteModal(true);
   };
 
+  const handleEditClick = (booking) => {
+    setSelectedBooking(booking);
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (selectedBooking) {
+      try {
+        const bookingRef = doc(db, "bookings", selectedBooking.id);
+        await updateDoc(bookingRef, {
+          aim: selectedBooking.aim,
+          destination: selectedBooking.destination,
+          status: selectedBooking.status,
+        });
+
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
+            booking.id === selectedBooking.id ? selectedBooking : booking
+          )
+        );
+        setShowEditModal(false);
+        setSelectedBooking(null);
+      } catch (error) {
+        console.error("Error updating booking: ", error);
+      }
+    }
+  };
+
   const tabsData = useMemo(
     () => [
       {
@@ -170,6 +199,7 @@ function Dashboard() {
         content: bookings.filter((booking) => booking.status === "Pending").length,
         color: "lightblue",
         icon: <FaClipboardList />,
+        isPending: bookings.filter((booking) => booking.status === "Pending").length > 0,
       },
       {
         heading: "Approved Bookings",
@@ -196,8 +226,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container ">
-      <Sidebar  logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
+    <div className="dashboard-container">
+      <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
       <div className="content-container">
         <Navbar
@@ -211,7 +241,10 @@ function Dashboard() {
         <div className="status-cards-container row mt-4">
           {tabsData.map((tab, index) => (
             <div key={index} className="col-12 col-md-3 mb-3">
-              <div className="status-card text-center p-3" style={{ backgroundColor: tab.color }}>
+              <div
+                className={`status-card text-center p-3 ${tab.isPending ? "btn-primary" : ""}`}
+                style={{ backgroundColor: tab.isPending ? "blue" : tab.color }}
+              >
                 {tab.icon}
                 <h5 className="mt-3">{tab.heading}</h5>
                 <p>{tab.content}</p>
@@ -264,7 +297,10 @@ function Dashboard() {
                             <FaTimes />
                           </button>
                         )}
-                        <button className="btn btn-sm btn-warning">
+                        <button
+                          className="btn btn-sm btn-warning"
+                          onClick={() => handleEditClick(booking)}
+                        >
                           <FaEdit />
                         </button>
                         <button
@@ -281,6 +317,55 @@ function Dashboard() {
             </table>
           </div>
         </div>
+
+        {/* Edit Booking Modal */}
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Booking</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId="editAim">
+                <Form.Label>Aim</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={selectedBooking?.aim || ""}
+                  onChange={(e) => setSelectedBooking({ ...selectedBooking, aim: e.target.value })}
+                />
+              </Form.Group>
+
+              <Form.Group controlId="editDestination">
+                <Form.Label>Destination</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={selectedBooking?.destination || ""}
+                  onChange={(e) => setSelectedBooking({ ...selectedBooking, destination: e.target.value })}
+                />
+              </Form.Group>
+
+              <Form.Group controlId="editStatus">
+                <Form.Label>Status</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={selectedBooking?.status || ""}
+                  onChange={(e) => setSelectedBooking({ ...selectedBooking, status: e.target.value })}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </Form.Control>
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              Close
+            </Button>
+            <Button className="orangeBtn" onClick={handleSaveEdit}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
         {/* Driver Modal */}
         <Modal show={showDriverModal} onHide={() => setShowDriverModal(false)}>
@@ -306,7 +391,7 @@ function Dashboard() {
             <Button variant="secondary" onClick={() => setShowDriverModal(false)}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleAssignDriver}>
+            <Button className="orangeBtn" onClick={handleAssignDriver}>
               Assign Driver
             </Button>
           </Modal.Footer>
@@ -324,11 +409,12 @@ function Dashboard() {
             <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={deleteBooking}>
+            <Button className="orangeBtn" onClick={deleteBooking}>
               Delete
             </Button>
           </Modal.Footer>
         </Modal>
+
       </div>
     </div>
   );

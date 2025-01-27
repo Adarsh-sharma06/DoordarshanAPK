@@ -1,8 +1,9 @@
 /* General Layout */
 .tracker-container {
-  /* display: flex; */
+  display: flex;
+  flex-direction: row;
   height: 100vh;
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 
 /* .main-content {
@@ -15,34 +16,29 @@
 } */
 
 /* Vehicle Map Container */
-/* .vehicle-map-container {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  margin-top: 20px;
-} */
-
-.tracker-content{
-  margin-left:250px;
-  /* height: 100vh; */
+.tracker-content {
+  margin-left: 250px; /* Sidebar width */
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease-in-out;
 }
 
 /* Vehicle Map Styles */
 .vehicle-map {
   flex-grow: 1;
-  height: 80vh;
+  height: 79vh;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
   /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 }
 
-.vehicle-map-container{
+.vehicle-map-container {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  /* margin-top: 20px; */
-
+  margin-top: 20px;
 }
 
 /* Map Placeholder */
@@ -53,33 +49,6 @@
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   flex: 1;
-}
-
-/* Navbar Styles */
-/* .navbar {
-  background-color: #ffffff;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-} */
-
-.navbar .profile {
-  display: flex;
-  align-items: center;
-}
-
-.navbar .profile img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.navbar .profile span {
-  font-weight: bold;
-  color: #333;
 }
 
 /* Vehicle List Styling */
@@ -122,17 +91,91 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
+  /* Sidebar */
+  .tracker-container {
+    flex-direction: column; /* Stack the sidebar and content vertically on small screens */
+  }
+
+  .tracker-content {
+    margin-left: 0; /* Remove left margin when the sidebar is collapsed */
+    padding: 10px;
+  }
+
+  /* Vehicle Map Container */
+  .vehicle-map-container {
+    flex-direction: column; /* Stack map and vehicle list vertically */
+  }
+
+  .vehicle-map {
+    height: 50vh; /* Reduce map size on smaller screens */
+  }
+
+  /* Map Placeholder */
+  .map-placeholder {
+    display: block; /* Show the map placeholder if map is not available */
+  }
+
+  /* Vehicle List */
+  .vehicle-list li {
+    padding: 8px; /* Reduce padding in the vehicle list items */
+    font-size: 14px;
+  }
+
+  /* Navbar adjustments */
+  .navbar {
+    flex-direction: column; /* Stack navbar items on smaller screens */
+    align-items: flex-start;
+  }
+
+  .navbar .profile-info {
+    display: flex;
+    flex-direction: column; /* Stack profile info vertically */
+    align-items: flex-start;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* For very small screens, like phones */
   .tracker-container {
     flex-direction: column;
+    height: 100%; /* Allow content to take full height */
+  }
+
+  .tracker-content {
+    margin-left: 0;
+    padding: 5px; /* Reduce padding */
+  }
+
+  /* Vehicle Map */
+  .vehicle-map {
+    height: 72vh; /* Further reduce map size */
   }
 
   .vehicle-map-container {
     flex-direction: column;
+  }
+
+  .vehicle-list li {
+    font-size: 12px; /* Reduce font size in the list */
+  }
+
+  .vehicle-list li h5 {
+    font-size: 14px;
   }
 }

@@ -11,89 +11,18 @@
   z-index: 1000;
   transition: transform 0.3s ease-in-out;
   overflow-y: auto;
+  transform: translateX(0); /* Sidebar visible by default on larger screens */
 }
 
-.menu li a.active {
-  background-color: #e9ecef;
-  color: #0056b3;
-  font-weight: bold;
-  border-radius: 5px;
-}
-
-.menu li a:hover {
-  background-color: #e9ecef;
-  color: #0056b3;
-}
-
-/* Sidebar Hidden for Small Screens */
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    /* Sidebar hidden off-screen by default */
-    width: 80%;
-    /* Sidebar takes 80% of screen width */
-    height: 100%;
-    /* Full height on mobile */
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-    /* Sidebar slides in when active */
-  }
-
-  /* Adjust Logo */
-  .logo {
-    font-size: 18px;
-    /* padding: 15px;
-    display: flex;
-    align-items: center; */
-    gap: 10px;
-  }
-
-  .logo-img {
-    width: 100px;
-    height: 100px;
-  }
-
-  /* Menu Styling */
-  .menu li a {
-    padding: 10px 15px;
-    display: block;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    /* Adjust font size */
-    transition: background-color 0.3s ease;
-  }
-
-  /* Navbar Adjustments */
-  .navbar {
-    padding: 10px;
-    justify-content: space-between;
-    margin-left: 0;
-  }
-
-  .burger-menu {
-    display: block;
-    /* Show burger menu */
-    cursor: pointer;
-    font-size: 24px;
-  }
-
-  /* Main Content Adjustments */
-  .main-content {
-    margin-left: 0;
-    /* Reset margin for content on mobile */
-    padding: 20px;
-  }
+.sidebar.active {
+  transform: translateX(0);
+  /* Sidebar visible when active */
 }
 
 /* Sidebar Logo */
 .logo {
   font-size: 80px;
   padding: 15px;
-  /* display: flex;
-  align-items: center; */
   gap: 10px;
 }
 
@@ -125,18 +54,47 @@
   transition: background-color 0.3s ease;
 }
 
+.menu li a.active {
+  background-color: #f99244;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.menu li a:hover {
+  background-color: #cd6321;
+  border-radius: 5px;
+}
+
+/* Burger Menu (Mobile) */
 .burger-menu {
   display: none;
-  /* Hidden by default */
+  /* Hidden by default on larger screens */
   cursor: pointer;
   font-size: 24px;
+}
+
+.burger-menu.open {
+  /* Style for the burger when open */
+}
+
+/* Close button for mobile */
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 30px;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  z-index: 1100;
 }
 
 /* Content Adjustments */
 .main-content {
   margin-left: 250px;
   /* Offset content for sidebar */
-  /* padding: 20px; */
+  padding: 20px;
 }
 
 /* Responsive Adjustments for Tablets and Small Screens */
@@ -148,9 +106,8 @@
 
   .sidebar {
     width: 100%;
-    /* Full width for sidebar */
     height: 100%;
-    /* Sidebar remains full height */
+    transform: translateX(0); /* Make sidebar visible when screen is tablet or smaller */
   }
 
   .main-content {
@@ -161,46 +118,65 @@
 
 /* Mobile Screens (Max width 768px) */
 @media (max-width: 768px) {
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    height: 100%;
+    transform: translateX(-100%); /* Sidebar hidden by default */
+    width: 80%; /* Sidebar takes 80% of screen width */
+  }
+
+  .sidebar.active {
+    transform: translateX(0); /* Sidebar visible when active */
+  }
+
+  /* Navbar Adjustments */
   .navbar {
     justify-content: space-between;
     padding: 10px;
   }
 
   .burger-menu {
-    display: block;
-    /* Show burger menu */
-  }
-
-  .navbar .logo {
-    font-size: 46px;
-  }
-
-  .sidebar {
-    position: fixed;
-    height: 100%;
-    transform: translateX(-100%);
-    /* Sidebar hidden by default */
-    width: 80%;
-    /* Sidebar takes 80% of screen width */
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-    /* Sidebar visible when active */
-  }
-
-  .main-content {
-    margin-left: 0;
-    /* Reset content margin */
-    padding: 20px;
+    display: block; /* Show burger menu */
   }
 
   .navbar .logo {
     font-size: 16px;
   }
 
+  /* Logo adjustments for mobile */
+  .logo {
+    font-size: 46px;
+  }
+
+  /* Menu Adjustments */
   .menu li a {
     font-size: 14px;
-    /* Smaller font size for mobile */
+    padding: 10px 15px;
+    display: block;
+    text-decoration: none;
+    color: #333;
   }
+
+  /* Main Content */
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  /* Sidebar Logo */
+  .logo-img {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+.redBtn{
+  background-color: lightcoral !important;
+  border-color: lightcoral !important;
+}
+
+.redBtn:hover{
+  background-color: red !important;
+  border-color: red !important;
 }
