@@ -16,7 +16,6 @@ const ForgotPassword = () => {
       toast.success("Password reset email sent! Check your inbox.");
     } catch (error) {
       toast.error("Error sending password reset email. Please try again.");
-      console.error(error);
     }
   };
 
@@ -48,9 +47,11 @@ const ForgotPassword = () => {
               required
             />
           </div>
+          <div className="middle mt-3">
           <button type="submit" className="reset-button mx-auto my-5">
             Send Reset Link
           </button>
+          </div>
         </form>
       </div>
 
