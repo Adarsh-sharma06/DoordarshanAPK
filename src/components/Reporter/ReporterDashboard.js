@@ -4,21 +4,25 @@ import Sidebar from "../ReusableComponents/Sidebar/Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../service/firebase";
 import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
-import { Tabs, Tab } from "@mui/material";
-import { FaStar, FaRegStar, FaCalendarAlt, FaMapMarkerAlt, FaCarAlt } from "react-icons/fa";
-import { Modal, Button, Form } from "react-bootstrap"; // Import modal components
+import { Tabs, Tab, Tooltip } from "@mui/material";
+import { FaStar, FaRegStar, FaCalendarAlt, FaMapMarkerAlt, FaCarAlt, FaPhoneAlt } from "react-icons/fa";
+import { Modal, Button, Form, OverlayTrigger } from "react-bootstrap";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ReporterDashboard() {
   const { currentUser } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [startingKMModalOpen, setStartingKMModalOpen] = useState(false);
+  const [endKMModalOpen, setEndKMModalOpen] = useState(false);
   const [currentBooking, setCurrentBooking] = useState(null);
+  const [startingKM, setStartingKM] = useState("");
   const [endKM, setEndKM] = useState("");
-  const [rating, setRating] = useState(1); // Rating starts from 1
+  const [rating, setRating] = useState(1);
   const [description, setDescription] = useState("");
-  const [driverNames, setDriverNames] = useState({}); // For storing driver names
+  const [driverNames, setDriverNames] = useState({});
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -32,28 +36,29 @@ function ReporterDashboard() {
         const bookingsData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-          startDate: doc.data().startDate?.toDate(),
+          startDate: doc.data().startDate ? doc.data().startDate.toDate() : null,
+          time: doc.data().time ? doc.data().time.toDate() : null,
         }));
         setBookings(bookingsData);
-        // After fetching bookings, get the driver names
         fetchDriverNames(bookingsData);
       } catch (error) {
         console.error("Error fetching bookings:", error);
+        toast.error("Failed to fetch bookings.");
       } finally {
         setLoading(false);
       }
     };
 
     const fetchDriverNames = async (bookings) => {
-      const driverEmails = [...new Set(bookings.map((booking) => booking.allotedDriver))]; // Get unique driver emails
+      const driverEmails = [...new Set(bookings.map((booking) => booking.allotedDriver))];
       const driverNamesObj = {};
-      for (let email of driverEmails) {
-        const userQuery = query(collection(db, "users"), where("email", "==", email));
-        const userSnapshot = await getDocs(userQuery);
-        if (!userSnapshot.empty) {
-          const userData = userSnapshot.docs[0].data();
-          driverNamesObj[email] = userData.name; // Store driver name by email
-        }
+      if (driverEmails.length > 0) {
+        const usersQuery = query(collection(db, "users"), where("email", "in", driverEmails));
+        const userSnapshot = await getDocs(usersQuery);
+        userSnapshot.docs.forEach((doc) => {
+          const userData = doc.data();
+          driverNamesObj[userData.email] = { name: userData.name, phone: userData.phone };
+        });
       }
       setDriverNames(driverNamesObj);
     };
@@ -61,33 +66,28 @@ function ReporterDashboard() {
     if (currentUser) fetchBookings();
   }, [currentUser]);
 
-  const isTodayOrFuture = (date) => new Date(date) >= new Date().setHours(0, 0, 0, 0);
-
-  const handleAddStartingKM = async (bookingId) => {
-    const startingKM = prompt("Enter Starting KM:");
+  const handleAddStartingKM = async () => {
     if (startingKM && !isNaN(startingKM)) {
       try {
-        const bookingDocRef = doc(db, "bookings", bookingId);
+        const bookingDocRef = doc(db, "bookings", currentBooking.id);
         await updateDoc(bookingDocRef, { startingKM: parseInt(startingKM, 10) });
         setBookings((prev) =>
           prev.map((booking) =>
-            booking.id === bookingId ? { ...booking, startingKM: parseInt(startingKM, 10) } : booking
+            booking.id === currentBooking.id ? { ...booking, startingKM: parseInt(startingKM, 10) } : booking
           )
         );
+        toast.success("Starting KM added successfully!");
+        resetStartingKMModal();
       } catch (error) {
         console.error("Error updating starting KM:", error);
+        toast.error("Failed to add Starting KM.");
       }
     } else {
-      alert("Please enter a valid number.");
+      toast.error("Please enter a valid number.");
     }
   };
 
-  const handleOpenModal = (booking) => {
-    setCurrentBooking(booking);
-    setModalOpen(true);
-  };
-
-  const handleModalSubmit = async () => {
+  const handleAddEndKMAndRating = async () => {
     if (endKM && rating) {
       try {
         const bookingDocRef = doc(db, "bookings", currentBooking.id);
@@ -103,22 +103,37 @@ function ReporterDashboard() {
               : booking
           )
         );
-        setModalOpen(false);
-        setCurrentBooking(null);
-        setEndKM("");
-        setRating(1); // Reset rating to 1 after submission
-        setDescription("");
+        toast.success("End KM and rating added successfully!");
+        resetEndKMModal();
       } catch (error) {
         console.error("Error updating booking:", error);
+        toast.error("Failed to add End KM and rating.");
       }
     } else {
-      alert("Please fill all fields.");
+      toast.error("Please fill all fields.");
     }
   };
 
+  const resetStartingKMModal = () => {
+    setStartingKMModalOpen(false);
+    setStartingKM("");
+    setCurrentBooking(null);
+  };
+
+  const resetEndKMModal = () => {
+    setEndKMModalOpen(false);
+    setEndKM("");
+    setRating(1);
+    setDescription("");
+    setCurrentBooking(null);
+  };
+
+  const isToday = (date) =>
+    new Date(date).toDateString() === new Date().toDateString() && new Date(date) <= new Date();
+
   const categorizedBookings = bookings.reduce(
     (acc, booking) => {
-      if (isTodayOrFuture(booking.startDate)) acc.upcoming.push(booking);
+      if (new Date(booking.startDate) >= new Date().setHours(0, 0, 0, 0)) acc.upcoming.push(booking);
       else acc.past.push(booking);
       return acc;
     },
@@ -127,14 +142,22 @@ function ReporterDashboard() {
 
   return (
     <div className="d-flex">
+      <ToastContainer position="top-right" autoClose={3000} />
       <Sidebar
-        menuSections={[{ heading: null, items: [{ name: "Dashboard", link: "/Reporter/ReporterDashboard", icon: "bi bi-house-door" },
-           { name: "Reports", link: "/Reporter/reports", icon: "bi bi-file-earmark-text" },
-        //  { name: "History", link: "/Reporter/History", icon: "bi bi-clock" },
-          { name: "Car Request", link: "/Reporter/CarRequest", icon: "bi bi-car-front" }] }, { heading: "Settings", items: [{ name: "Profile", link: "/Profile", icon: "bi bi-person" }] }]} showLogout={true} />
+        menuSections={[{
+          heading: null,
+          items: [
+            { name: "Dashboard", link: "/Reporter/ReporterDashboard", icon: "bi bi-house-door" },
+            { name: "Reports", link: "/Reporter/reports", icon: "bi bi-file-earmark-text" },
+            { name: "Car Request", link: "/Reporter/CarRequest", icon: "bi bi-car-front" },
+          ],
+        },
+        { heading: "Settings", items: [{ name: "Profile", link: "/Profile", icon: "bi bi-person" }] },
+        ]} 
+        showLogout={true}
+      />
       <div className="main-content flex-grow-1">
         <Navbar title="Reporter Dashboard" userEmail={currentUser?.email} />
-
         <div className="container-fluid mt-4">
           <Tabs
             value={activeTab}
@@ -164,57 +187,115 @@ function ReporterDashboard() {
                           <FaMapMarkerAlt className="me-2" />
                           {booking.destination}
                         </h5>
-                        <h6 className="card-subtitle text-muted mb-2">
+                        <div className="d-flex mt-4 mb-2 align-items-center">
                           <FaCarAlt className="me-2" />
-                          {driverNames[booking.allotedDriver] || "Driver not found"}
-                        </h6>
+                          {driverNames[booking.allotedDriver] ? (
+                            <OverlayTrigger
+                              overlay={
+                                <Tooltip
+                                  id="tooltip-phone"
+                                  data-placement="right"
+                                  PopperProps={{
+                                    modifiers: [
+                                      {
+                                        name: "offset",
+                                        options: {
+                                          offset: [0, 8], // Adds space between the tooltip and the target element
+                                        },
+                                      },
+                                    ],
+                                  }}
+                                >
+                                  {driverNames[booking.allotedDriver].phone ? (
+                                    <span>
+                                      Call: <a href={`tel:${driverNames[booking.allotedDriver].phone}`}>{driverNames[booking.allotedDriver].phone}</a>
+                                    </span>
+                                  ) : (
+                                    "No mobile number available"
+                                  )}
+                                </Tooltip>
+                              }
+                            >
+                              <span
+                                style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                  window.location.href = `tel:${driverNames[booking.allotedDriver].phone}`;
+                                }}
+                              >
+                                {driverNames[booking.allotedDriver].name || "Driver not found"}
+                              </span>
+                            </OverlayTrigger>
+                          ) : (
+                            <span className="text-muted">Driver not found</span>
+                          )}
+                        </div>
+
                         <p className="card-text">
                           <FaCalendarAlt className="me-2" />
-                          {booking.startDate.toLocaleString()}
-                        </p>
-                        <p>
-                          <strong>Status:</strong>{" "}
-                          <span
-                            className={`badge ${booking.status === "Approved" ? "bg-success" : "bg-warning"
-                              }`}
-                          >
-                            {booking.status}
-                          </span>
+                          {booking.startDate
+                            ? booking.startDate.toLocaleDateString("en-GB")
+                            : "No Start Date"}
+                          {booking.time
+                            ? `, ${booking.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                            : ""}
                         </p>
 
-                        {/* Display rating with stars */}
-                        <p>
-                          <strong>Rating:</strong>
-                          <div className="d-flex">
-                            {[...Array(5)].map((_, index) => (
-                              <div key={index} className="me-1">
-                                {booking.rating > index ? (
-                                  <FaStar color="gold" size={24} />
-                                ) : (
-                                  <FaRegStar color="gold" size={24} />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </p>
+                        {booking.startingKM && booking.endKM ? (
+                          <>
+                            <p>
+                              <strong>Total KM:</strong> {booking.endKM - booking.startingKM} km
+                            </p>
+                            <p>
+                              <strong>Status:</strong>{" "}
+                              <span className="badge bg-primary">Completed</span>
+                            </p>
+                          </>
+                        ) : (
+                          <p>
+                            <strong>Status:</strong>{" "}
+                            <span
+                              className={`badge ${booking.status === "Approved" ? "bg-success" : "bg-warning"
+                                }`}
+                            >
+                              {booking.status}
+                            </span>
+                          </p>
+                        )}
 
-                        {/* Action buttons */}
-                        {booking.status === "Approved" && !booking.startingKM && activeTab === "upcoming" && (
-                          <button
-                            className="btn btn-outline-success w-100 mt-2"
-                            onClick={() => handleAddStartingKM(booking.id)}
-                          >
-                            Add Starting KM
-                          </button>
-                        )}
-                        {booking.status === "Approved" && booking.startingKM && !booking.endKM && activeTab === "upcoming" && (
-                          <button
-                            className="btn btn-outline-primary w-100 mt-2"
-                            onClick={() => handleOpenModal(booking)}
-                          >
-                            Add Ending KM & Rating
-                          </button>
-                        )}
+                        {/* Actions */}
+                        {booking.status === "Approved" &&
+                          !booking.startingKM &&
+                          activeTab === "upcoming" &&
+                          isToday(booking.startDate) && (
+                            <OverlayTrigger overlay={<Tooltip>Add starting kilometers for the trip.</Tooltip>} placement="top">
+                              <button
+                                className="btn btn-outline-success w-100 mt-2"
+                                onClick={() => {
+                                  setCurrentBooking(booking);
+                                  setStartingKMModalOpen(true);
+                                }}
+                              >
+                                Add Starting KM
+                              </button>
+                            </OverlayTrigger>
+                          )}
+
+                        {booking.status === "Approved" &&
+                          booking.startingKM &&
+                          !booking.endKM &&
+                          activeTab === "upcoming" && (
+                            <OverlayTrigger overlay={<Tooltip>Complete the trip details.</Tooltip>} placement="top">
+                              <button
+                                className="btn btn-outline-primary w-100 mt-2"
+                                onClick={() => {
+                                  setCurrentBooking(booking);
+                                  setEndKMModalOpen(true);
+                                }}
+                              >
+                                Add Ending KM & Rating
+                              </button>
+                            </OverlayTrigger>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -229,61 +310,83 @@ function ReporterDashboard() {
         </div>
       </div>
 
-      {/* Modal for Adding Ending KM and Rating */}
-      <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
+      {/* Modals */}
+      <Modal show={startingKMModalOpen} onHide={resetStartingKMModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Add Ending KM and Rating</Modal.Title>
+          <Modal.Title>Add Starting KM</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Ending KM</Form.Label>
+              <Form.Label>Starting KM</Form.Label>
               <Form.Control
                 type="number"
-                placeholder="Enter Ending KM"
-                value={endKM}
-                onChange={(e) => setEndKM(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Rating</Form.Label>
-              <div className="d-flex">
-                {[...Array(5)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="me-1"
-                    onClick={() => setRating(index + 1)} // Rating starts from 1
-                    style={{ cursor: "pointer" }}
-                  >
-                    {rating > index ? (
-                      <FaStar color="gold" size={24} />
-                    ) : (
-                      <FaRegStar color="gold" size={24} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Enter a description (optional)"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={startingKM}
+                onChange={(e) => setStartingKM(e.target.value)}
+                placeholder="Enter starting kilometers"
               />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModalOpen(false)}>
+          <Button variant="secondary" onClick={resetStartingKMModal}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleModalSubmit}>
-            Submit
+          <Button variant="primary" onClick={handleAddStartingKM}>
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={endKMModalOpen} onHide={resetEndKMModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add End KM & Rating</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>End KM</Form.Label>
+              <Form.Control
+                type="number"
+                value={endKM}
+                onChange={(e) => setEndKM(e.target.value)}
+                placeholder="Enter end kilometers"
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Rating</Form.Label>
+              <Form.Control
+                as="select"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+              >
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+              </Form.Control>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Description (optional)</Form.Label>
+              <Form.Control
+                as="textarea"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                placeholder="Enter any comments"
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={resetEndKMModal}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleAddEndKMAndRating}>
+            Save
           </Button>
         </Modal.Footer>
       </Modal>
