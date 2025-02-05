@@ -9,12 +9,14 @@ import {
   CircularProgress,
   Tooltip,
   IconButton,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { db } from "../../../service/firebase";
@@ -31,6 +33,8 @@ function CarRequest() {
     startDate: null,
     time: null,
     bookingType: "Local",
+    holdType: "Drop and Go", // Default to "Drop and Go"
+    holdDuration: "", // Duration in "HH:MM" format
   });
   const [loading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState([dayjs(), dayjs().add(1, "day")]);
@@ -69,6 +73,20 @@ function CarRequest() {
     setDateRange(type === "Local" ? [dayjs(), dayjs().add(1, "day")] : [dayjs(), dayjs().add(2, "day")]);
   };
 
+  const handleHoldTypeChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      holdType: e.target.value,
+      holdDuration: e.target.value === "Drop and Go" ? "" : prev.holdDuration, // Reset duration if "Drop and Go" is selected
+    }));
+  };
+
+  const validateHoldDuration = (duration) => {
+    // Validate the "HH:MM" format
+    const regex = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+    return regex.test(duration);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -80,12 +98,20 @@ function CarRequest() {
         return;
       }
 
+      // Validate hold duration if "On Hold" is selected
+      if (formData.holdType === "On Hold" && !validateHoldDuration(formData.holdDuration)) {
+        toast.error("Please enter a valid duration in HH:MM format (e.g., 2:30).");
+        setLoading(false);
+        return;
+      }
+
       const userEmail = currentUser.email;
       const userName = userEmail.split("@")[0];
       const bookingData = {
         ...formData,
         startDate: formData.startDate ? formData.startDate.toDate() : null,
         time: formData.time ? formData.time.toDate() : null,
+        holdDuration: formData.holdType === "On Hold" ? formData.holdDuration : null, // Save duration as "HH:MM"
         status: "Pending",
         allotedDriver: "",
         email: userEmail,
@@ -117,6 +143,8 @@ function CarRequest() {
         startDate: null,
         time: null,
         bookingType: "Local",
+        holdType: "Drop and Go",
+        holdDuration: "",
       });
     } catch (error) {
       console.error("Error submitting car request: ", error);
@@ -243,6 +271,45 @@ function CarRequest() {
                     />
                   </LocalizationProvider>
                 </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                    Hold Type *
+                  </Typography>
+                  <RadioGroup
+                    row
+                    name="holdType"
+                    value={formData.holdType}
+                    onChange={handleHoldTypeChange}
+                  >
+                    <FormControlLabel
+                      value="Drop and Go"
+                      control={<Radio />}
+                      label="Drop and Go"
+                    />
+                    <FormControlLabel
+                      value="On Hold"
+                      control={<Radio />}
+                      label="On Hold"
+                    />
+                  </RadioGroup>
+                </Grid>
+
+                {formData.holdType === "On Hold" && (
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Hold Duration (HH:MM) *"
+                      variant="outlined"
+                      fullWidth
+                      name="holdDuration"
+                      value={formData.holdDuration}
+                      onChange={handleChange}
+                      required
+                      placeholder="e.g., 2:30"
+                      inputProps={{ pattern: "([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]" }} // Enforce HH:MM format
+                    />
+                  </Grid>
+                )}
 
                 <Grid item xs={12}>
                   <Button

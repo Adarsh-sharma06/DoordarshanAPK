@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Navbar from "../ReusableComponents/Navbar/Navbar";
 import Sidebar from "../ReusableComponents/Sidebar/Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../service/firebase";
 import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
-import { Tabs, Tab, Tooltip } from "@mui/material";
-import { FaStar, FaRegStar, FaCalendarAlt, FaMapMarkerAlt, FaCarAlt, FaPhoneAlt } from "react-icons/fa";
-import { Modal, Button, Form, OverlayTrigger } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BookingTabs from "./BookingTabs";
+import BookingCard from "./BookingCard";
+import { StartingKMModal, EndKMModal } from "./Modals";
 
 function ReporterDashboard() {
   const { currentUser } = useAuth();
@@ -89,6 +89,10 @@ function ReporterDashboard() {
 
   const handleAddEndKMAndRating = async () => {
     if (endKM && rating) {
+      if (rating <= 2 && !description) {
+        toast.error("Description is compulsory for ratings of 2 stars or below.");
+        return;
+      }
       try {
         const bookingDocRef = doc(db, "bookings", currentBooking.id);
         await updateDoc(bookingDocRef, {
@@ -128,17 +132,17 @@ function ReporterDashboard() {
     setCurrentBooking(null);
   };
 
-  const isToday = (date) =>
-    new Date(date).toDateString() === new Date().toDateString() && new Date(date) <= new Date();
+  const isToday = useCallback((date) =>
+    new Date(date).toDateString() === new Date().toDateString() && new Date(date) <= new Date(), []);
 
-  const categorizedBookings = bookings.reduce(
+  const categorizedBookings = useMemo(() => bookings.reduce(
     (acc, booking) => {
       if (new Date(booking.startDate) >= new Date().setHours(0, 0, 0, 0)) acc.upcoming.push(booking);
       else acc.past.push(booking);
       return acc;
     },
     { upcoming: [], past: [] }
-  );
+  ), [bookings]);
 
   return (
     <div className="d-flex">
@@ -153,23 +157,13 @@ function ReporterDashboard() {
           ],
         },
         { heading: "Settings", items: [{ name: "Profile", link: "/Profile", icon: "bi bi-person" }] },
-        ]} 
+        ]}
         showLogout={true}
       />
       <div className="main-content flex-grow-1">
         <Navbar title="Reporter Dashboard" userEmail={currentUser?.email} />
         <div className="container-fluid mt-4">
-          <Tabs
-            value={activeTab}
-            onChange={(e, val) => setActiveTab(val)}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="fullWidth"
-            className="mb-3"
-          >
-            <Tab label="Upcoming Bookings" value="upcoming" />
-            <Tab label="Past Bookings" value="past" />
-          </Tabs>
+          <BookingTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {loading ? (
             <div className="text-center">
@@ -180,125 +174,20 @@ function ReporterDashboard() {
             <div className="row">
               {categorizedBookings[activeTab]?.length > 0 ? (
                 categorizedBookings[activeTab].map((booking) => (
-                  <div key={booking.id} className="col-12 col-md-6 col-lg-4 mb-3">
-                    <div className="card shadow-lg">
-                      <div className="card-body p-4">
-                        <h5 className="card-title text-primary">
-                          <FaMapMarkerAlt className="me-2" />
-                          {booking.destination}
-                        </h5>
-                        <div className="d-flex mt-4 mb-2 align-items-center">
-                          <FaCarAlt className="me-2" />
-                          {driverNames[booking.allotedDriver] ? (
-                            <OverlayTrigger
-                              overlay={
-                                <Tooltip
-                                  id="tooltip-phone"
-                                  data-placement="right"
-                                  PopperProps={{
-                                    modifiers: [
-                                      {
-                                        name: "offset",
-                                        options: {
-                                          offset: [0, 8], // Adds space between the tooltip and the target element
-                                        },
-                                      },
-                                    ],
-                                  }}
-                                >
-                                  {driverNames[booking.allotedDriver].phone ? (
-                                    <span>
-                                      Call: <a href={`tel:${driverNames[booking.allotedDriver].phone}`}>{driverNames[booking.allotedDriver].phone}</a>
-                                    </span>
-                                  ) : (
-                                    "No mobile number available"
-                                  )}
-                                </Tooltip>
-                              }
-                            >
-                              <span
-                                style={{ cursor: "pointer" }}
-                                onClick={() => {
-                                  window.location.href = `tel:${driverNames[booking.allotedDriver].phone}`;
-                                }}
-                              >
-                                {driverNames[booking.allotedDriver].name || "Driver not found"}
-                              </span>
-                            </OverlayTrigger>
-                          ) : (
-                            <span className="text-muted">Driver not found</span>
-                          )}
-                        </div>
-
-                        <p className="card-text">
-                          <FaCalendarAlt className="me-2" />
-                          {booking.startDate
-                            ? booking.startDate.toLocaleDateString("en-GB")
-                            : "No Start Date"}
-                          {booking.time
-                            ? `, ${booking.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                            : ""}
-                        </p>
-
-                        {booking.startingKM && booking.endKM ? (
-                          <>
-                            <p>
-                              <strong>Total KM:</strong> {booking.endKM - booking.startingKM} km
-                            </p>
-                            <p>
-                              <strong>Status:</strong>{" "}
-                              <span className="badge bg-primary">Completed</span>
-                            </p>
-                          </>
-                        ) : (
-                          <p>
-                            <strong>Status:</strong>{" "}
-                            <span
-                              className={`badge ${booking.status === "Approved" ? "bg-success" : "bg-warning"
-                                }`}
-                            >
-                              {booking.status}
-                            </span>
-                          </p>
-                        )}
-
-                        {/* Actions */}
-                        {booking.status === "Approved" &&
-                          !booking.startingKM &&
-                          activeTab === "upcoming" &&
-                          isToday(booking.startDate) && (
-                            <OverlayTrigger overlay={<Tooltip>Add starting kilometers for the trip.</Tooltip>} placement="top">
-                              <button
-                                className="btn btn-outline-success w-100 mt-2"
-                                onClick={() => {
-                                  setCurrentBooking(booking);
-                                  setStartingKMModalOpen(true);
-                                }}
-                              >
-                                Add Starting KM
-                              </button>
-                            </OverlayTrigger>
-                          )}
-
-                        {booking.status === "Approved" &&
-                          booking.startingKM &&
-                          !booking.endKM &&
-                          activeTab === "upcoming" && (
-                            <OverlayTrigger overlay={<Tooltip>Complete the trip details.</Tooltip>} placement="top">
-                              <button
-                                className="btn btn-outline-primary w-100 mt-2"
-                                onClick={() => {
-                                  setCurrentBooking(booking);
-                                  setEndKMModalOpen(true);
-                                }}
-                              >
-                                Add Ending KM & Rating
-                              </button>
-                            </OverlayTrigger>
-                          )}
-                      </div>
-                    </div>
-                  </div>
+                  <BookingCard
+                    key={booking.id}
+                    booking={booking}
+                    driverNames={driverNames}
+                    isToday={isToday}
+                    onAddStartingKM={(booking) => {
+                      setCurrentBooking(booking);
+                      setStartingKMModalOpen(true);
+                    }}
+                    onAddEndKM={(booking) => {
+                      setCurrentBooking(booking);
+                      setEndKMModalOpen(true);
+                    }}
+                  />
                 ))
               ) : (
                 <div className="col-12 text-center">
@@ -310,86 +199,25 @@ function ReporterDashboard() {
         </div>
       </div>
 
-      {/* Modals */}
-      <Modal show={startingKMModalOpen} onHide={resetStartingKMModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Starting KM</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Starting KM</Form.Label>
-              <Form.Control
-                type="number"
-                value={startingKM}
-                onChange={(e) => setStartingKM(e.target.value)}
-                placeholder="Enter starting kilometers"
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={resetStartingKMModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleAddStartingKM}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <StartingKMModal
+        show={startingKMModalOpen}
+        onHide={resetStartingKMModal}
+        startingKM={startingKM}
+        setStartingKM={setStartingKM}
+        onSave={handleAddStartingKM}
+      />
 
-      <Modal show={endKMModalOpen} onHide={resetEndKMModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add End KM & Rating</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>End KM</Form.Label>
-              <Form.Control
-                type="number"
-                value={endKM}
-                onChange={(e) => setEndKM(e.target.value)}
-                placeholder="Enter end kilometers"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Rating</Form.Label>
-              <Form.Control
-                as="select"
-                value={rating}
-                onChange={(e) => setRating(e.target.value)}
-              >
-                <option value="1">1 Star</option>
-                <option value="2">2 Stars</option>
-                <option value="3">3 Stars</option>
-                <option value="4">4 Stars</option>
-                <option value="5">5 Stars</option>
-              </Form.Control>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Description (optional)</Form.Label>
-              <Form.Control
-                as="textarea"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                placeholder="Enter any comments"
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={resetEndKMModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleAddEndKMAndRating}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <EndKMModal
+        show={endKMModalOpen}
+        onHide={resetEndKMModal}
+        endKM={endKM}
+        setEndKM={setEndKM}
+        rating={rating}
+        setRating={setRating}
+        description={description}
+        setDescription={setDescription}
+        onSave={handleAddEndKMAndRating}
+      />
     </div>
   );
 }

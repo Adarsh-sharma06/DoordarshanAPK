@@ -1,11 +1,14 @@
+// Report.js
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../ReusableComponents/Sidebar/Sidebar";
 import Navbar from "../../ReusableComponents/Navbar/Navbar";
 import StatusTab from "../../ReusableComponents/StatusTab/StatusTab";
-import { db, collection, getDocs, auth } from "../../../service/firebase"; // Firebase imports
-import { onAuthStateChanged } from "firebase/auth"; // To track auth state
+import FilterSection from "./FilterSection";
+import ReportTable from "./ReportTable";
+import { db, collection, getDocs, auth } from "../../../service/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { FaPrint } from "react-icons/fa";
-import "./Report.css"; // Custom CSS
+import "./Report.css";
 
 function Report() {
   const menuSections = [
@@ -25,7 +28,7 @@ function Report() {
     },
   ];
 
-  const [userEmail, setUserEmail] = useState(""); // State for logged-in user's email
+  const [userEmail, setUserEmail] = useState("");
   const [bookings, setBookings] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +38,6 @@ function Report() {
   const [monthFilter, setMonthFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
 
-  // Track the logged-in user's email
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -72,9 +74,7 @@ function Report() {
           ...doc.data(),
         }));
 
-        // Filter users by role to get only reporters
         const reporters = userList.filter((user) => user.role === "Reporter");
-
         setUsers(reporters);
       } catch (error) {
         console.error("Error fetching users: ", error);
@@ -138,27 +138,92 @@ function Report() {
 
   const totalData = filteredBookings.reduce(
     (totals, booking) => {
+      const startKM = booking.startingKM || 0; // Default to 0 if missing
+      const endKM = booking.endKM || 0; // Default to 0 if missing
+  
       totals.totalBookings++;
-      totals.totalKmMoved += booking.endKM - booking.startingKM;
+      totals.totalKmMoved += Math.max(0, endKM - startKM); // Ensure no negative values
       return totals;
     },
     { totalBookings: 0, totalKmMoved: 0 }
   );
+  
 
   const handlePrint = () => {
-    const content = document.getElementById("report-content");
-    const printWindow = window.open("", "", "height=500,width=800");
-    printWindow.document.write("<html><head><title>Bookings Report</title>");
-    printWindow.document.write(
-      '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">'
-    );
-    printWindow.document.write("</head><body>");
-    const tableContent = content.querySelector(".table-responsive");
-    printWindow.document.write(tableContent.innerHTML);
-    printWindow.document.write("</body></html>");
+    const tableElement = document.querySelector(".table-responsive");
+  
+    if (!tableElement) {
+      alert("Report table not found! Please make sure the table is visible.");
+      return;
+    }
+  
+    const tableContent = tableElement.outerHTML;
+  
+    const printWindow = window.open("", "", "height=600,width=900");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Bookings Report</title>
+          <style>
+            body {
+              font-family: 'Arial', sans-serif;
+              margin: 20px;
+              padding: 20px;
+              text-align: center;
+            }
+            h2 {
+              margin-bottom: 10px;
+            }
+            .summary {
+              font-size: 16px;
+              font-weight: bold;
+              margin-bottom: 15px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 10px;
+              text-align: left;
+              font-size: 14px;
+            }
+            th {
+              background-color: #f2f2f2;
+              font-weight: bold;
+              text-align: center;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            tr:hover {
+              background-color: #f1f1f1;
+            }
+            @media print {
+              body {
+                margin: 0;
+                padding: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Bookings Report</h2>
+          <div class="summary">
+            <p><strong>Total Bookings:</strong> ${totalData.totalBookings}</p>
+            <p><strong>Total KM Moved:</strong> ${totalData.totalKmMoved || 0} km</p>
+          </div>
+          ${tableContent}
+        </body>
+      </html>
+    `);
+  
     printWindow.document.close();
     printWindow.print();
   };
+  
 
   return (
     <div className="Reports-container">
@@ -177,125 +242,29 @@ function Report() {
                 heading: "Total Km Moved",
                 content: totalData.totalKmMoved || 0,
                 color: "f99244",
-                customClass: "totalKM", // Custom class for styling
+                customClass: "totalKM",
               },
             ]}
           />
         </div>
 
         <div id="report-content" className="mt-5 rounded-container">
-          {/* Filter Section */}
-          <div className="mb-4 d-flex justify-content-between filter-wrapper">
-            {/* Reporter Dropdown */}
-            <div className="filter-dropdown">
-              <select
-                className="form-control filter-select"
-                value={reporterFilter}
-                onChange={(e) => setReporterFilter(e.target.value)}
-              >
-                <option value="">Reporter</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.email}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <FilterSection
+            users={users}
+            reporterFilter={reporterFilter}
+            setReporterFilter={setReporterFilter}
+            monthFilter={monthFilter}
+            setMonthFilter={setMonthFilter}
+            yearFilter={yearFilter}
+            setYearFilter={setYearFilter}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            handlePrint={handlePrint}
+          />
 
-            {/* Month Dropdown */}
-            <div className="filter-dropdown">
-              <select
-                className="form-control filter-select"
-                value={monthFilter}
-                onChange={(e) => setMonthFilter(e.target.value)}
-              >
-                <option value="">Month</option>
-                {[...Array(12).keys()].map((month) => (
-                  <option key={month} value={month}>
-                    {new Date(0, month).toLocaleString("default", { month: "long" })}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Year Dropdown */}
-            <div className="filter-dropdown">
-              <select
-                className="form-control filter-select"
-                value={yearFilter}
-                onChange={(e) => setYearFilter(e.target.value)}
-              >
-                <option value="">Year</option>
-                {[...Array(5).keys()].map((yearOffset) => {
-                  const currentYear = new Date().getFullYear();
-                  return (
-                    <option key={yearOffset} value={currentYear - yearOffset}>
-                      {currentYear - yearOffset}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
-            {/* Search Bar */}
-            <div className="filter-dropdown">
-              <input
-                type="text"
-                className="form-control filter-select"
-                placeholder="Search"
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* Print Button */}
-            <div className="text-end">
-              <button className="btn print-btn" onClick={handlePrint}>
-                <FaPrint /> Print Report
-              </button>
-            </div>
-          </div>
-
-          {/* Report Heading */}
           <h4 className="mb-4">Bookings Reports</h4>
 
-          <div className="table-responsive">
-            <table className="table table-striped table-hover">
-              <thead className="thead-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Reporter Name</th>
-                  <th>Aim</th>
-                  <th>Time</th>
-                  <th>Date</th>
-                  <th>Destination</th>
-                  <th>Booking Type</th>
-                  <th>Distance (km)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBookings.map((booking, index) => (
-                  <tr key={booking.id}>
-                    <td>{index + 1}</td>
-                    <td>{reporterNames[booking.email]}</td>
-                    <td>{booking.aim || "N/A"}</td>
-                    <td>
-                      {booking.time
-                        ? new Date(booking.time.seconds * 1000).toLocaleTimeString("en-GB")
-                        : "N/A"}
-                    </td>
-                    <td>
-                      {booking.startDate
-                        ? new Date(booking.startDate.seconds * 1000).toLocaleDateString("en-GB")
-                        : "N/A"}
-                    </td>
-                    <td>{booking.destination || "N/A"}</td>
-                    <td>{booking.bookingType || "N/A"}</td>
-                    <td>{(booking.endKM - booking.startingKM) || 0}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ReportTable filteredBookings={filteredBookings} reporterNames={reporterNames} />
         </div>
       </div>
     </div>
