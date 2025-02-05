@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, MenuItem, Box, Typography } from "@mui/material";
+import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, addUser } from "../../../../service/firebase"; // Adjust the path as needed
+import { db, auth } from "../../../../service/firebase"; // Adjust the path as needed
 import Sidebar from "../../../ReusableComponents/Sidebar/Sidebar"; // Adjust the path as needed
 import Navbar from "../../../ReusableComponents/Navbar/Navbar"; // Adjust the path as needed
 import { onAuthStateChanged } from "firebase/auth"; // To track auth state
@@ -11,7 +12,6 @@ const AddUserForm = () => {
     name: "",
     email: "",
     phone: "",
-    employeeID: "", // New field
     role: "Reporter", // Default role
     profileImage: "", // Profile image URL
     password: "",
@@ -43,10 +43,10 @@ const AddUserForm = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, phone, employeeID, role, profileImage, password, confirmPassword } = formData;
+    const { name, email, phone, role, profileImage, password, confirmPassword } = formData;
 
     // Validate input
-    if (!name || !email || !phone || !employeeID || !role || !profileImage || !password || !confirmPassword) {
+    if (!name || !email || !phone || !profileImage || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       setSuccess("");
       return;
@@ -60,19 +60,16 @@ const AddUserForm = () => {
 
     try {
       // Create user in Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const userId = userCredential.user.uid; // Get the Firebase Auth UID
+      await createUserWithEmailAndPassword(auth, email, password);
 
-      // Save user data to Firestore using the service layer function
-      await addUser(userId, {
-        isActive: true, // Default to active
+      // Save user data to Firebase Firestore using email as document ID
+      await setDoc(doc(db, "users", email), {
         name,
         email,
         phone,
-        employeeID,
         role,
         profileImage,
-        timeStamp: new Date().toISOString(), // Add timestamp
+        joinedDate: new Date().toISOString(),
       });
 
       // If successful, show a success message
@@ -84,7 +81,6 @@ const AddUserForm = () => {
         name: "",
         email: "",
         phone: "",
-        employeeID: "",
         role: "Reporter",
         profileImage: "",
         password: "",
@@ -187,13 +183,6 @@ const AddUserForm = () => {
             onChange={handleChange}
             required
             type="tel"
-          />
-          <TextField
-            label="Employee ID"
-            name="employeeID"
-            value={formData.employeeID}
-            onChange={handleChange}
-            required
           />
           <TextField
             label="Role"
