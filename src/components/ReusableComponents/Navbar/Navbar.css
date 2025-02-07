@@ -144,8 +144,11 @@
   .navbar {
     flex-direction: row;
     align-items: center;
-    padding: 15px 20px;
+    padding: 25px 5px;
   }
+.navbar-left{
+margin-left: 10%;
+}
 
   .navbar-left h1 {
     font-size: 20px;
@@ -175,7 +178,7 @@
 
   .navbar-right {
     order: 2;
-    width: 100%;
+    /* width: 100%; */
     justify-content: flex-start; /* Align items to the left */
     gap: 10px;
   }

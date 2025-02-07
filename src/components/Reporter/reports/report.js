@@ -60,7 +60,7 @@ function RReport() {
     };
 
     return (
-        <div className="d-flex">
+        <div className="dashboard-container">
             <Sidebar
                 menuSections={[
                     {
@@ -76,8 +76,8 @@ function RReport() {
                 ]}
                 showLogout={true}
             />
-            <div className="main-content flex-grow-1">
-                <Navbar title="Reporter Dashboard" userEmail={currentUser?.email || "Guest"} />
+            <div className="content-container">
+                <Navbar title="Reports" userEmail={currentUser?.email || "Guest"} />
 
                 <div className="container-fluid mt-4">
                     <Tabs
@@ -95,27 +95,29 @@ function RReport() {
 
                     {/* Flexbox Layout for Heading, Search and Print Button */}
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h4 className="mb-4">Reports</h4>
+  <h4 className="mb-0">Reports</h4>
 
-                        <div className="d-flex">
-                            <div className="input-group w-50 me-3">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by destination or driver"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                                <span className="input-group-text">
-                                    <FaSearch />
-                                </span>
-                            </div>
-                            <button className="btn btn-primary px-4" onClick={handlePrint}>
-                                <FaPrint /> Print Report
-                            </button>
+  <div className="d-flex align-items-center">
+  <div className="filter-dropdown">
+              <input
+                type="text"
+                className="form-control filter-select"
+                placeholder="Search"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+     
+    {/* <button className="btn btn-primary d-flex align-items-center">
+      <FaPrint className="me-2" /> Print Report
+    </button> */}
+    <div className="text-end">
+                  <button className="btn print-btn" onClick={handlePrint}>
+                    <FaPrint /> Print Report
+                  </button>
+                </div>
+  </div>
+</div>
 
-                        </div>
-                    </div>
 
                     {loading ? (
                         <div className="text-center">

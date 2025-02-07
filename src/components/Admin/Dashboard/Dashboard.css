@@ -1,49 +1,48 @@
-/* General Dashboard Layout */
+/* 
 .dashboard-container {
   display: flex;
-  flex-direction: row; /* Default: Sidebar and content side by side */
-  height: 100vh; /* Full viewport height */
+  flex-direction: row; 
+  height: 100vh; 
   overflow: hidden;
 }
 
-/* Sidebar Styling */
 .sidebar-container {
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px; /* Sidebar width for larger screens */
+  width: 250px; 
   height: 100%;
   background-color: #f8f9fa;
   border-right: 1px solid #ddd;
   overflow-y: auto;
-  z-index: 10; /* Ensure it stays above other content */
+  z-index: 10; 
   transition: transform 0.3s ease-in-out;
-}
+} */
 
 .sidebar-container.hidden {
-  transform: translateX(-100%); /* Sidebar hidden off-screen */
+  transform: translateX(-100%); 
 }
 
 .sidebar-container.active {
-  transform: translateX(0); /* Sidebar visible */
+  transform: translateX(0); 
 }
 
 /* Content Styling */
 .content-container {
-  margin-left: 250px; /* Sidebar width */
+  margin-left: 200px;
   flex: 1;
-  /* padding: 20px; */
+
   overflow-y: auto;
-  transition: margin-left 0.3s ease-in-out; /* Smooth transition */
+  transition: margin-left 0.3s ease-in-out; 
 }
 
 /* Status Cards */
 .status-cards-container {
   display: flex;
   flex-wrap: wrap;
-  margin-left: 28px;
-  gap: 100px;
-  /* justify-content: space-between; Ensure even distribution */
+  /* margin-left: 28px; */
+  /* gap: 100px; */
+  justify-content: space-evenly;
 }
 
 .status-card {

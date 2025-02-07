@@ -17,7 +17,7 @@
 
 /* Vehicle Map Container */
 .tracker-content {
-  margin-left: 250px; /* Sidebar width */
+  margin-left: 200px; /* Sidebar width */
   flex: 1;
   /* padding: 20px; */
   overflow-y: auto;
@@ -132,14 +132,14 @@
   }
 
   /* Navbar adjustments */
-  .navbar {
-    flex-direction: column; /* Stack navbar items on smaller screens */
+  /* .navbar {
+    flex-direction: column;
     align-items: flex-start;
-  }
+  } */
 
   .navbar .profile-info {
     display: flex;
-    flex-direction: column; /* Stack profile info vertically */
+    flex-direction: column; 
     align-items: flex-start;
   }
 

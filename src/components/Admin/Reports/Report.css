@@ -7,7 +7,7 @@
 }
 
 .Reports-content {
-  margin-left: 250px; /* Sidebar width */
+  margin-left: 200px; /* Sidebar width */
   flex: 1;
   transition: margin-left 0.3s ease-in-out;
 }
@@ -235,8 +235,9 @@ h4 {
 
   /* Adjusting the filter section for smaller screens */
   .filter-wrapper {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
   }
 
   .filter-wrapper .w-30 {
@@ -252,7 +253,7 @@ h4 {
 @media (max-width: 480px) {
   /* For very small mobile devices */
   .Reports-container {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .Reports-content {
@@ -285,7 +286,7 @@ h4 {
   }
 
   .filter-wrapper {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .filter-wrapper .w-30 {

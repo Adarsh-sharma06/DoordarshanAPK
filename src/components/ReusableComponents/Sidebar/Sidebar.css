@@ -1,6 +1,6 @@
 /* Sidebar Styles */
 .sidebar {
-  width: 250px;
+  width: 200px;
   /* Default width for larger screens */
   height: 100vh;
   position: fixed;
@@ -71,6 +71,7 @@
   /* Hidden by default on larger screens */
   cursor: pointer;
   font-size: 24px;
+  
 }
 
 .burger-menu.open {
@@ -92,7 +93,7 @@
 
 /* Content Adjustments */
 .main-content {
-  margin-left: 250px;
+  margin-left: 200px;
   /* Offset content for sidebar */
   /* padding: 20px; */
 }
@@ -138,6 +139,14 @@
 
   .burger-menu {
     display: block; /* Show burger menu */
+    position: absolute;
+    z-index: 1100;
+    cursor: pointer;
+    font-size: 40px;
+    left: 10px;
+    top: 19px;
+    transition: 0.3s;
+
   }
 
   .navbar .logo {

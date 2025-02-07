@@ -114,14 +114,11 @@ const Profile = () => {
   if (loading) return <div className="text-center">Loading...</div>;
 
   return (
-    <div className="d-flex">
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <Sidebar
-        menuSections={menuSections}
-        showLogout={true}
-      />
+      <Sidebar  menuSections={menuSections} showLogout={true}      />
       {/* Main Content */}
-      <div className="main-content flex-grow-1">
+      <div className="content-container">
         {/* Navbar */}
         <Navbar title="Profile" userEmail={currentUser?.email || "Guest"} />
 

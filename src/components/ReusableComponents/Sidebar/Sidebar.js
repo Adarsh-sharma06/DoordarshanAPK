@@ -47,7 +47,7 @@ function Sidebar({
         className={`sidebar bg-light shadow-sm ${isSidebarOpen ? "active" : ""} d-md-block`}
       >
         {/* Logo Section */}
-        <div className="logo text-center p-4">
+        <div className="logo text-center p-2">
           <img
             src={logoSrc}
             alt="Logo"
@@ -57,13 +57,13 @@ function Sidebar({
         </div>
 
         {/* Close Button for Mobile */}
-        <button
+        {/* <button
           className="close-btn d-md-none"
           onClick={closeSidebar}
           aria-label="Close Sidebar"
         >
           <i className="bi bi-x"></i>
-        </button>
+        </button> */}
 
         {/* Menu Section */}
         <ul className="menu list-unstyled w-100">
