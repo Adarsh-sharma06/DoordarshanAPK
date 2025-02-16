@@ -75,7 +75,22 @@ function Dashboard() {
             ...doc.data(),
           }));
 
-          setBookings(bookingList);
+          // Sort bookings by date and time (newest first)
+          const sortedBookings = bookingList.sort((a, b) => {
+            const dateTimeA = new Date(a.startDate.seconds * 1000);
+            const dateTimeB = new Date(b.startDate.seconds * 1000);
+
+            // If there's a separate time field, adjust accordingly
+            if (a.time?.seconds && b.time?.seconds) {
+              dateTimeA.setHours(new Date(a.time.seconds * 1000).getHours(), new Date(a.time.seconds * 1000).getMinutes());
+              dateTimeB.setHours(new Date(b.time.seconds * 1000).getHours(), new Date(b.time.seconds * 1000).getMinutes());
+            }
+
+            return dateTimeB - dateTimeA; // Sort in descending order (newest first)
+          });
+
+
+          setBookings(sortedBookings);
 
           const emails = Array.from(new Set(bookingList.map((booking) => booking.email)));
           const usersQuery = query(collection(db, "users"), where("email", "in", emails));
@@ -230,7 +245,6 @@ function Dashboard() {
       <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
       <div className="content-container">
-
         <Navbar
           title="Admin Dashboard"
           placeholder="Search for something..."
@@ -239,7 +253,7 @@ function Dashboard() {
           userEmail={userData?.email}
         />
 
-        <div className="status-cards-container  mt-4">
+        <div className="status-cards-container mt-4">
           {tabsData.map((tab, index) => (
             <div key={index} className="col-12 col-md-3 mb-3">
               <div
@@ -276,8 +290,11 @@ function Dashboard() {
                     <td>{index + 1}</td>
                     <td>{userNames[booking.email] || booking.email}</td>
                     <td>{booking.aim || "N/A"}</td>
-                    <td>{new Date(booking.time.seconds * 1000).toLocaleTimeString()}</td>
-                    <td>{new Date(booking.startDate.seconds * 1000).toLocaleDateString()}</td>
+                    <td>{new Date(booking.time.seconds * 1000).toLocaleTimeString()}</td><td>
+                      {new Date(booking.startDate.seconds * 1000)
+                        .toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" })}
+                    </td>
+
                     <td>{booking.destination || 0}</td>
                     <td>{booking.status || "N/A"}</td>
                     <td>
@@ -415,7 +432,6 @@ function Dashboard() {
             </Button>
           </Modal.Footer>
         </Modal>
-
       </div>
     </div>
   );

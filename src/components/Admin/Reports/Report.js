@@ -51,10 +51,13 @@ function Report() {
       try {
         const bookingsCollection = collection(db, "bookings");
         const bookingSnapshot = await getDocs(bookingsCollection);
-        const bookingList = bookingSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const bookingList = bookingSnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .sort((a, b) => b.startDate.seconds - a.startDate.seconds); // Sorting by date in descending order
+
         setBookings(bookingList);
         setLoading(false);
       } catch (error) {
@@ -251,7 +254,7 @@ function Report() {
             {/* Print Button */}
             <div className="text-end">
               <button className="btn print-btn" onClick={handlePrint}>
-                <FaPrint /> Print 
+                <FaPrint /> Print
               </button>
             </div>
           </div>
