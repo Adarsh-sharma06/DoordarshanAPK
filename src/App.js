@@ -14,6 +14,7 @@ import CarRequest from "./components/Reporter/CarRequest/CarRequest";
 import RReport from "./components/Reporter/reports/report";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./components/ReusableComponents/Profile/Profile";
+import RatingReport from "./components/Admin/Rating/Rating";
 import { useAuth } from "./context/AuthContext"; // Use AuthContext
 
 function App() {
@@ -68,6 +69,14 @@ function App() {
           element={
             <ProtectedRoute allowedRole="Admin">
               <Report />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Admin/Rating/RatingReport"
+          element={
+            <ProtectedRoute allowedRole="Admin">
+              <RatingReport />
             </ProtectedRoute>
           }
         />

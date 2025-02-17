@@ -19,6 +19,7 @@ function Tracker() {
         { name: "Dashboard", link: "/Admin/Dashboard", icon: "bi bi-speedometer2" },
         { name: "Tracker", link: "/Admin/Tracker", icon: "bi bi-map" },
         { name: "Reports", link: "/Admin/Reports/Report", icon: "bi bi-bar-chart" },
+        { name: "Rating Report", link: "/Admin/Rating/RatingReport", icon: "bi bi-star" },
       ],
     },
     {

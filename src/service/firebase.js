@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
-  signInWithEmailAndPassword, 
+  signInWithEmailAndPassword,
   sendPasswordResetEmail // Added this for password reset functionality
 } from "firebase/auth";
 import { 
@@ -10,7 +10,8 @@ import {
   addDoc, 
   getDoc, 
   collection, 
-  getDocs, 
+  getDocs,
+  setDoc,
   query, 
   where, 
   updateDoc, 
@@ -54,6 +55,7 @@ export {
   sendPasswordResetEmail, // Export this function
   doc,
   getDoc,
+  setDoc,
   collection,
   getDocs,
   query,

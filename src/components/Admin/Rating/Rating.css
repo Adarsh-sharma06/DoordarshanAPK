@@ -1,0 +1,166 @@
+.Ratings-content {
+    margin-left: 200px;
+}
+
+.badge-success {
+    background-color: #28a745;
+    font-size: larger;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.DriverName {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.textSize {
+    font-size: 32px;
+    font-weight: bolder;
+}
+
+.card-body {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.card-title {
+    color: #f99244;
+    font-weight: bolder;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.rightEdge {
+    margin-left: auto;
+}
+
+.mergeContianer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.filter-dropdown {
+    min-width: 150px;
+}
+
+.print-btn {
+    background-color: #f99244;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.print-btn:hover {
+    background-color: #f78c35;
+}
+
+.table-responsive {
+    /* margin-top: 30px; */
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table th {
+    background-color: #f99244 !important;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.table td {
+    text-align: center;
+    padding: 10px;
+}
+
+.rating-star {
+    color: #ffd700;
+    font-size: 18px;
+}
+
+.rating-star-empty {
+    color: #ddd;
+}
+
+.rating-star-container {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    /* Adjust the sidebar */
+    .Ratings-content {
+        margin-left: 0;
+        padding: 10px;
+    }
+
+    /* Adjust card content */
+    .card-body {
+        padding: 15px;
+    }
+
+    .mergeContianer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-dropdown {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* Adjust the table layout */
+    .table-responsive {
+        margin-top: 20px;
+    }
+
+    .table th, .table td {
+        padding: 8px;
+    }
+
+    .print-btn {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Adjust text size for mobile */
+    .textSize {
+        font-size: 24px;
+    }
+
+    .DriverName {
+        font-size: 16px;
+    }
+
+    .badge-success {
+        font-size: medium;
+        padding: 4px 8px;
+    }
+}
