@@ -98,6 +98,32 @@ function CarRequest() {
         return;
       }
 
+      if (!formData.startDate) {
+        toast.error("Start Date is required!");
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.time) {
+        toast.error("Time is required!");
+        setLoading(false);
+        return;
+      }
+
+      // **Combine date and time for validation**
+      const selectedDate = dayjs(formData.startDate).startOf("day"); // Ensure only date is considered
+      const today = dayjs().startOf("day"); // Today’s date without time
+      const maxDate = formData.bookingType === "Local" ? today.add(2, "day") : today.add(3, "day");
+
+      // **Check if selected date is within the allowed range**
+      if (selectedDate.isBefore(today) || selectedDate.isAfter(maxDate)) {
+        toast.error(
+          `For ${formData.bookingType} trips, the start date must be between ${today.format("DD/MM/YYYY")} and ${maxDate.format("DD/MM/YYYY")}.`
+        );
+        setLoading(false);
+        return;
+      }
+
       // Validate hold duration if "On Hold" is selected
       if (formData.holdType === "On Hold" && !validateHoldDuration(formData.holdDuration)) {
         toast.error("Please enter a valid duration in HH:MM format (e.g., 2:30).");
@@ -107,11 +133,12 @@ function CarRequest() {
 
       const userEmail = currentUser.email;
       const userName = userEmail.split("@")[0];
+
       const bookingData = {
         ...formData,
-        startDate: formData.startDate ? formData.startDate.toDate() : null,
-        time: formData.time ? formData.time.toDate() : null,
-        holdDuration: formData.holdType === "On Hold" ? formData.holdDuration : null, // Save duration as "HH:MM"
+        startDate: formData.startDate.toDate(),
+        time: formData.time.toDate(),
+        holdDuration: formData.holdType === "On Hold" ? formData.holdDuration : null,
         status: "Pending",
         allotedDriver: "",
         email: userEmail,
@@ -153,6 +180,10 @@ function CarRequest() {
       setLoading(false);
     }
   };
+
+
+
+
 
   return (
     <div className="d-flex">
