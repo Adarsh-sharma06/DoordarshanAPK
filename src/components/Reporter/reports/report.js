@@ -2,50 +2,78 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../../ReusableComponents/Navbar/Navbar";
 import Sidebar from "../../ReusableComponents/Sidebar/Sidebar";
 import { Tabs, Tab } from "@mui/material";
-import { db, collection, getDocs, query } from "../../../service/firebase";
-import { FaPrint, FaSearch, FaCarAlt, FaCalendarAlt } from "react-icons/fa";
-import { getAuth } from "firebase/auth";
+import { db, collection, getDocs, query, where, doc, getDoc } from "../../../service/firebase";
+import { FaPrint, FaCarAlt, FaCalendarAlt } from "react-icons/fa";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function RReport() {
     const [activeTab, setActiveTab] = useState("all");
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-
-    // Fetch the current user from Firebase Auth
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+    const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
-        const fetchReports = async () => {
-            setLoading(true);
-            try {
-                const reportsQuery = query(collection(db, "bookings"));
-                const snapshot = await getDocs(reportsQuery);
-                const data = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    startDate: doc.data().startDate?.toDate(),
-                }));
-                setReports(data);
-            } catch (error) {
-                console.error("Error fetching reports:", error);
-            } finally {
-                setLoading(false);
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setCurrentUser(user);
+                fetchReports(user);
+            } else {
+                setCurrentUser(null);
+                setReports([]);
             }
-        };
-        fetchReports();
+        });
+
+        return () => unsubscribe();
     }, []);
+
+    const fetchReports = async (user) => {
+        if (!user) return;
+        setLoading(true);
+        try {
+            const reportsQuery = query(
+                collection(db, "bookings"),
+                where("email", "==", user.email) // Ensure Firestore has `email` field
+            );
+    
+            const snapshot = await getDocs(reportsQuery);
+            const data = await Promise.all(
+                snapshot.docs.map(async (docSnap) => {
+                    const report = { id: docSnap.id, ...docSnap.data(), startDate: docSnap.data().startDate?.toDate() };
+                    
+                    // Fetch driver name from users collection using allotedDriver email
+                    if (report.allotedDriver) {
+                        const driverRef = doc(db, "users", report.allotedDriver);
+                        const driverSnap = await getDoc(driverRef);
+                        report.driverName = driverSnap.exists() ? driverSnap.data().name || "Unknown Driver" : "Driver Not Found";
+                    } else {
+                        report.driverName = "Not Assigned";
+                    }
+    
+                    return report;
+                })
+            );
+            setReports(data);
+        } catch (error) {
+            console.error("Error fetching reports:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
     const filteredReports = reports.filter((report) => {
         const matchesTab =
             activeTab === "all" ||
             (activeTab === "local" && report.bookingType?.toLowerCase() === "local") ||
             (activeTab === "outstation" && report.bookingType?.toLowerCase() === "outstation");
+
         const matchesSearch =
             searchTerm === "" ||
             report.destination?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            report.driver?.toLowerCase().includes(searchTerm.toLowerCase());
+            report.driverName?.toLowerCase().includes(searchTerm.toLowerCase());
+
         return matchesTab && matchesSearch;
     });
 
@@ -68,7 +96,6 @@ function RReport() {
                         items: [
                             { name: "Dashboard", link: "/Reporter/ReporterDashboard", icon: "bi bi-house-door" },
                             { name: "Reports", link: "/Reporter/reports", icon: "bi bi-file-earmark-text" },
-                            // { name: "History", link: "/Reporter/History", icon: "bi bi-clock" },
                             { name: "Car Request", link: "/Reporter/CarRequest", icon: "bi bi-car-front" },
                         ],
                     },
@@ -93,31 +120,21 @@ function RReport() {
                         <Tab label="Outstation Trips" value="outstation" />
                     </Tabs>
 
-                    {/* Flexbox Layout for Heading, Search and Print Button */}
                     <div className="d-flex justify-content-between align-items-center mb-3">
-  <h4 className="mb-0">Reports</h4>
+                        <h4 className="mb-0">Reports</h4>
 
-  <div className="d-flex align-items-center">
-  <div className="filter-dropdown">
-              <input
-                type="text"
-                className="form-control filter-select"
-                placeholder="Search"
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-     
-    {/* <button className="btn btn-primary d-flex align-items-center">
-      <FaPrint className="me-2" /> Print Report
-    </button> */}
-    <div className="text-end">
-                  <button className="btn print-btn" onClick={handlePrint}>
-                    <FaPrint /> Print Report
-                  </button>
-                </div>
-  </div>
-</div>
-
+                        <div className="d-flex align-items-center">
+                            <input
+                                type="text"
+                                className="form-control filter-select"
+                                placeholder="Search"
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button className="btn print-btn ms-2" onClick={handlePrint}>
+                                <FaPrint /> Print Report
+                            </button>
+                        </div>
+                    </div>
 
                     {loading ? (
                         <div className="text-center">
@@ -147,7 +164,7 @@ function RReport() {
                                                         <FaCarAlt className="me-2" />
                                                         {report.destination || "N/A"}
                                                     </td>
-                                                    <td>{report.driver || "N/A"}</td>
+                                                    <td>{report.driverName || "N/A"}</td>
                                                     <td>{report.bookingType || "N/A"}</td>
                                                     <td>
                                                         <FaCalendarAlt className="me-2" />

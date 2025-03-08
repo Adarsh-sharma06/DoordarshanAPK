@@ -134,7 +134,7 @@ function RatingReport() {
         setDriverRatings(driverAvgRatings);
 
         // Calculate overall rating across all drivers
-        const overallRating = totalCount > 0 ? (totalSum / totalCount).toFixed(1) : 0;
+        const overallRating = totalCount > 0 ? (totalSum / totalCount).toFixed(1) : 3; // Default to 3 if no ratings
         setOverallRating(overallRating);
     }, [users, bookings]);
 
@@ -329,6 +329,7 @@ function RatingReport() {
                                         <td>
                                             <div className="rating-star-container">
                                                 {booking.rating ? (
+                                                    // If rating exists, display stars based on the rating
                                                     [...Array(5)].map((_, i) => (
                                                         <FaStar
                                                             key={i}
@@ -336,7 +337,13 @@ function RatingReport() {
                                                         />
                                                     ))
                                                 ) : (
-                                                    "N/A"
+                                                    // If rating is 0 or undefined, display 3 stars as the minimum
+                                                    [...Array(5)].map((_, i) => (
+                                                        <FaStar
+                                                            key={i}
+                                                            className={i < 3 ? "rating-star" : "rating-star-empty"} // Always show 3 stars
+                                                        />
+                                                    ))
                                                 )}
                                             </div>
                                         </td>

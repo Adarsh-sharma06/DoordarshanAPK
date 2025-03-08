@@ -90,7 +90,6 @@ function CarRequest() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       if (!currentUser) {
         toast.error("User is not authenticated!");

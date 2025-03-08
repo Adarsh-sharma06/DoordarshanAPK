@@ -1,15 +1,9 @@
 import React from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
-const EditBookingModal = ({
-  showEditModal,
-  setShowEditModal,
-  selectedBooking,
-  setSelectedBooking,
-  handleSaveEdit,
-}) => {
+const EditBookingModal = ({ show, onHide, selectedBooking, onSave }) => {
   return (
-    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+    <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>Edit Booking</Modal.Title>
       </Modal.Header>
@@ -20,7 +14,9 @@ const EditBookingModal = ({
             <Form.Control
               type="text"
               value={selectedBooking?.aim || ""}
-              onChange={(e) => setSelectedBooking({ ...selectedBooking, aim: e.target.value })}
+              onChange={(e) =>
+                onSave({ ...selectedBooking, aim: e.target.value })
+              }
             />
           </Form.Group>
 
@@ -29,7 +25,9 @@ const EditBookingModal = ({
             <Form.Control
               type="text"
               value={selectedBooking?.destination || ""}
-              onChange={(e) => setSelectedBooking({ ...selectedBooking, destination: e.target.value })}
+              onChange={(e) =>
+                onSave({ ...selectedBooking, destination: e.target.value })
+              }
             />
           </Form.Group>
 
@@ -38,7 +36,9 @@ const EditBookingModal = ({
             <Form.Control
               as="select"
               value={selectedBooking?.status || ""}
-              onChange={(e) => setSelectedBooking({ ...selectedBooking, status: e.target.value })}
+              onChange={(e) =>
+                onSave({ ...selectedBooking, status: e.target.value })
+              }
             >
               <option value="Pending">Pending</option>
               <option value="Approved">Approved</option>
@@ -48,10 +48,10 @@ const EditBookingModal = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+        <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
-        <Button className="orangeBtn" onClick={handleSaveEdit}>
+        <Button className="orangeBtn" onClick={() => onSave(selectedBooking)}>
           Save Changes
         </Button>
       </Modal.Footer>

@@ -1,9 +1,9 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
 
-const DeleteBookingModal = ({ showDeleteModal, setShowDeleteModal, deleteBooking }) => {
+const DeleteBookingModal = ({ show, onHide, onDelete }) => {
   return (
-    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+    <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>Delete Booking</Modal.Title>
       </Modal.Header>
@@ -11,10 +11,10 @@ const DeleteBookingModal = ({ showDeleteModal, setShowDeleteModal, deleteBooking
         <p>Are you sure you want to delete this booking?</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+        <Button variant="secondary" onClick={onHide}>
           Cancel
         </Button>
-        <Button className="orangeBtn" onClick={deleteBooking}>
+        <Button className="orangeBtn" onClick={onDelete}>
           Delete
         </Button>
       </Modal.Footer>

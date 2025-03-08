@@ -1,27 +1,34 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  db,
-  collection,
-  getDocs,
-  query,
-  where,
-  doc,
-  updateDoc,
-  deleteDoc,
-} from "../../../service/firebase";
+import { db, collection, getDocs, query, where, doc, updateDoc, deleteDoc } from "../../../service/firebase";
+import { FaClipboardList, FaCheck, FaTimes } from "react-icons/fa";
 import Sidebar from "../../ReusableComponents/Sidebar/Sidebar";
 import Navbar from "../../ReusableComponents/Navbar/Navbar";
+import StatusCards from "../StatusCards/StatusCards";
+import BookingTable from "../BookingTable/BookingTable";
+import EditBookingModal from "../Modals/EditBookingModal";
+import AssignDriverModal from "../Modals/AssignDriverModal";
+import DeleteBookingModal from "../Modals/DeleteBookingModal";
+import Pagination from "../Pagination/Pagination";
+import ChatBot from "../ChatBot/ChatBot";
 import "./Dashboard.css";
-import {
-  FaEdit,
-  FaTrashAlt,
-  FaCheck,
-  FaTimes,
-  FaClipboardList,
-} from "react-icons/fa";
-import { Modal, Button, Form } from "react-bootstrap";
 
-function Dashboard() {
+const Dashboard = () => {
+  const [bookings, setBookings] = useState([]);
+  const [userNames, setUserNames] = useState({});
+  const [showDriverModal, setShowDriverModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [drivers, setDrivers] = useState([]);
+  const [driverSelection, setDriverSelection] = useState(null);
+  const [userData, setUserData] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Number of items per page
+
+  // Define menuSections for Sidebar
   const menuSections = [
     {
       heading: "Main Menu",
@@ -40,93 +47,56 @@ function Dashboard() {
     },
   ];
 
-  const [userData, setUserData] = useState(null);
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userNames, setUserNames] = useState({});
-  const [showDriverModal, setShowDriverModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedBookingId, setSelectedBookingId] = useState(null);
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [drivers, setDrivers] = useState([]);
-  const [driverSelection, setDriverSelection] = useState(null);
-
+  // Fetch bookings, user names, drivers, and user data
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userQuery = query(collection(db, "users"), where("role", "==", "Admin"));
-        const userSnapshot = await getDocs(userQuery);
-        const userDoc = userSnapshot.docs.map((doc) => doc.data())[0];
-        setUserData(userDoc);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
-        setLoading(false);
-      }
+    const fetchData = async () => {
+      // Fetch bookings
+      const bookingsQuery = query(collection(db, "bookings"));
+      const bookingsSnapshot = await getDocs(bookingsQuery);
+      const bookingsData = bookingsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort bookings by startDate (latest first)
+      const sortedBookings = bookingsData.sort((a, b) => {
+        const dateA = a.startDate?.seconds ? new Date(a.startDate.seconds * 1000) : new Date(0);
+        const dateB = b.startDate?.seconds ? new Date(b.startDate.seconds * 1000) : new Date(0);
+        return dateB - dateA; // Sort in descending order (latest first)
+      });
+
+      setBookings(sortedBookings);
+
+      // Fetch user names
+      const usersQuery = query(collection(db, "users"));
+      const usersSnapshot = await getDocs(usersQuery);
+      const userNamesMap = {};
+      usersSnapshot.forEach((doc) => {
+        const user = doc.data();
+        userNamesMap[user.email] = user.name;
+      });
+      setUserNames(userNamesMap);
+
+      // Fetch drivers
+      const driversQuery = query(collection(db, "users"), where("role", "==", "Driver"));
+      const driversSnapshot = await getDocs(driversQuery);
+      const driversData = driversSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setDrivers(driversData);
+
+      // Fetch admin user data
+      const adminQuery = query(collection(db, "users"), where("role", "==", "Admin"));
+      const adminSnapshot = await getDocs(adminQuery);
+      const adminData = adminSnapshot.docs.map((doc) => doc.data())[0];
+      setUserData(adminData);
     };
 
-    const fetchBookings = async () => {
-      if (userData?.email) {
-        try {
-          const bookingsCollection = collection(db, "bookings");
-          const bookingSnapshot = await getDocs(bookingsCollection);
-          const bookingList = bookingSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+    fetchData();
+  }, []);
 
-          // Sort bookings by date and time (newest first)
-          const sortedBookings = bookingList.sort((a, b) => {
-            const dateTimeA = new Date(a.startDate.seconds * 1000);
-            const dateTimeB = new Date(b.startDate.seconds * 1000);
-
-            // If there's a separate time field, adjust accordingly
-            if (a.time?.seconds && b.time?.seconds) {
-              dateTimeA.setHours(new Date(a.time.seconds * 1000).getHours(), new Date(a.time.seconds * 1000).getMinutes());
-              dateTimeB.setHours(new Date(b.time.seconds * 1000).getHours(), new Date(b.time.seconds * 1000).getMinutes());
-            }
-
-            return dateTimeB - dateTimeA; // Sort in descending order (newest first)
-          });
-
-
-          setBookings(sortedBookings);
-
-          const emails = Array.from(new Set(bookingList.map((booking) => booking.email)));
-          const usersQuery = query(collection(db, "users"), where("email", "in", emails));
-          const usersSnapshot = await getDocs(usersQuery);
-          const userNamesMap = {};
-          usersSnapshot.forEach((doc) => {
-            const user = doc.data();
-            userNamesMap[user.email] = user.name;
-          });
-          setUserNames(userNamesMap);
-        } catch (error) {
-          console.error("Error fetching bookings: ", error);
-        }
-      }
-    };
-
-    const fetchDrivers = async () => {
-      try {
-        const driversQuery = query(collection(db, "users"), where("role", "==", "Driver"));
-        const driversSnapshot = await getDocs(driversQuery);
-        const driversList = driversSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setDrivers(driversList);
-      } catch (error) {
-        console.error("Error fetching drivers: ", error);
-      }
-    };
-
-    fetchUserData();
-
-    if (userData) {
-      fetchBookings();
-      fetchDrivers();
-    }
-  }, [userData]);
-
+  // Define updateBookingStatus function
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       const bookingRef = doc(db, "bookings", bookingId);
@@ -141,73 +111,7 @@ function Dashboard() {
     }
   };
 
-  const deleteBooking = async () => {
-    try {
-      const bookingRef = doc(db, "bookings", selectedBookingId);
-      await deleteDoc(bookingRef);
-      setBookings((prevBookings) => prevBookings.filter((booking) => booking.id !== selectedBookingId));
-      setShowDeleteModal(false);
-    } catch (error) {
-      console.error("Error deleting booking: ", error);
-    }
-  };
-
-  const handleApproveClick = (bookingId) => {
-    setSelectedBookingId(bookingId);
-    setShowDriverModal(true);
-  };
-
-  const handleRejectClick = (bookingId) => {
-    updateBookingStatus(bookingId, "Rejected");
-  };
-
-  const handleDriverSelection = (driverId) => {
-    setDriverSelection(driverId);
-  };
-
-  const handleAssignDriver = async () => {
-    if (selectedBookingId && driverSelection) {
-      updateBookingStatus(selectedBookingId, "Approved");
-      const bookingRef = doc(db, "bookings", selectedBookingId);
-      await updateDoc(bookingRef, { allotedDriver: driverSelection });
-      setShowDriverModal(false);
-      setSelectedBookingId(null);
-    }
-  };
-
-  const handleDeleteModalShow = (bookingId) => {
-    setSelectedBookingId(bookingId);
-    setShowDeleteModal(true);
-  };
-
-  const handleEditClick = (booking) => {
-    setSelectedBooking(booking);
-    setShowEditModal(true);
-  };
-
-  const handleSaveEdit = async () => {
-    if (selectedBooking) {
-      try {
-        const bookingRef = doc(db, "bookings", selectedBooking.id);
-        await updateDoc(bookingRef, {
-          aim: selectedBooking.aim,
-          destination: selectedBooking.destination,
-          status: selectedBooking.status,
-        });
-
-        setBookings((prevBookings) =>
-          prevBookings.map((booking) =>
-            booking.id === selectedBooking.id ? selectedBooking : booking
-          )
-        );
-        setShowEditModal(false);
-        setSelectedBooking(null);
-      } catch (error) {
-        console.error("Error updating booking: ", error);
-      }
-    }
-  };
-
+  // Define tabsData for StatusCards
   const tabsData = useMemo(
     () => [
       {
@@ -233,18 +137,64 @@ function Dashboard() {
     [bookings]
   );
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentBookings = bookings.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Handle modal actions
+  const handleApproveClick = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setShowDriverModal(true);
+  };
+
+  const handleRejectClick = (bookingId) => {
+    updateBookingStatus(bookingId, "Rejected");
+  };
+
+  const handleEditClick = (booking) => {
+    setSelectedBooking(booking);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteClick = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setShowDeleteModal(true);
+  };
+
+  const handleAssignDriver = async (driverId) => {
+    if (selectedBookingId && driverId) {
+      const bookingRef = doc(db, "bookings", selectedBookingId);
+      await updateDoc(bookingRef, { allotedDriver: driverId, status: "Approved" });
+      setShowDriverModal(false);
+      setSelectedBookingId(null);
+    }
+  };
+
+  const handleSaveEdit = async (updatedBooking) => {
+    const bookingRef = doc(db, "bookings", updatedBooking.id);
+    await updateDoc(bookingRef, {
+      aim: updatedBooking.aim,
+      destination: updatedBooking.destination,
+      status: updatedBooking.status,
+    });
+    setShowEditModal(false);
+    setSelectedBooking(null);
+  };
+
+  const handleDeleteBooking = async () => {
+    const bookingRef = doc(db, "bookings", selectedBookingId);
+    await deleteDoc(bookingRef);
+    setShowDeleteModal(false);
+    setSelectedBookingId(null);
+  };
 
   return (
     <div className="dashboard-container">
       <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
-
       <div className="content-container">
         <Navbar
           title="Admin Dashboard"
@@ -253,189 +203,42 @@ function Dashboard() {
           profileName={userData?.name || "Admin"}
           userEmail={userData?.email}
         />
-
-        <div className="status-cards-container mt-4">
-          {tabsData.map((tab, index) => (
-            <div key={index} className="col-12 col-md-3 mb-3">
-              <div
-                className={`status-card text-center p-3 ${tab.isPending ? "btn-primary" : ""}`}
-                style={{ backgroundColor: tab.isPending ? "blue" : tab.color }}
-              >
-                {tab.icon}
-                <h5 className="mt-3">{tab.heading}</h5>
-                <p>{tab.content}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="booking-details container-fluid mt-5">
-          <h4>Booking Details</h4>
-          <div className="table-responsive">
-            <table className="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Reporter Name</th>
-                  <th>Aim</th>
-                  <th>Time</th>
-                  <th>Date</th>
-                  <th>Destination</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((booking, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{userNames[booking.email] || booking.email}</td>
-                    <td>{booking.aim || "N/A"}</td>
-                    <td>{new Date(booking.time.seconds * 1000).toLocaleTimeString()}</td><td>
-                      {new Date(booking.startDate.seconds * 1000)
-                        .toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" })}
-                    </td>
-
-                    <td>{booking.destination || 0}</td>
-                    <td>{booking.status || "N/A"}</td>
-                    <td>
-                      <div className="btn-group">
-                        {booking.status !== "Approved" && (
-                          <button
-                            className="btn btn-sm btn-success"
-                            onClick={() => handleApproveClick(booking.id)}
-                          >
-                            <FaCheck />
-                          </button>
-                        )}
-                        {booking.status !== "Rejected" && (
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleRejectClick(booking.id)}
-                          >
-                            <FaTimes />
-                          </button>
-                        )}
-                        <button
-                          className="btn btn-sm btn-warning"
-                          onClick={() => handleEditClick(booking)}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => handleDeleteModalShow(booking.id)}
-                        >
-                          <FaTrashAlt />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Edit Booking Modal */}
-        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Edit Booking</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group controlId="editAim">
-                <Form.Label>Aim</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={selectedBooking?.aim || ""}
-                  onChange={(e) => setSelectedBooking({ ...selectedBooking, aim: e.target.value })}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="editDestination">
-                <Form.Label>Destination</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={selectedBooking?.destination || ""}
-                  onChange={(e) => setSelectedBooking({ ...selectedBooking, destination: e.target.value })}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="editStatus">
-                <Form.Label>Status</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedBooking?.status || ""}
-                  onChange={(e) => setSelectedBooking({ ...selectedBooking, status: e.target.value })}
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                </Form.Control>
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-              Close
-            </Button>
-            <Button className="orangeBtn" onClick={handleSaveEdit}>
-              Save Changes
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
-        {/* Driver Modal */}
-        <Modal show={showDriverModal} onHide={() => setShowDriverModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Assign Driver</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h6>Select a Driver:</h6>
-            <Form.Control
-              as="select"
-              value={driverSelection || ""}
-              onChange={(e) => handleDriverSelection(e.target.value)}
-            >
-              <option value="">--Select Driver--</option>
-              {drivers.map((driver) => (
-                <option key={driver.id} value={driver.id}>
-                  {driver.name}
-                </option>
-              ))}
-            </Form.Control>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowDriverModal(false)}>
-              Close
-            </Button>
-            <Button className="orangeBtn" onClick={handleAssignDriver}>
-              Assign Driver
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
-        {/* Delete Modal */}
-        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Delete Booking</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Are you sure you want to delete this booking?</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-              Cancel
-            </Button>
-            <Button className="orangeBtn" onClick={deleteBooking}>
-              Delete
-            </Button>
-          </Modal.Footer>
-        </Modal>
+        <StatusCards tabsData={tabsData} />
+        <BookingTable
+          bookings={currentBookings}
+          userNames={userNames}
+          onApprove={handleApproveClick}
+          onReject={handleRejectClick}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+        />
+        <Pagination
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          totalItems={bookings.length}
+          paginate={paginate}
+        />
+        <EditBookingModal
+          show={showEditModal}
+          onHide={() => setShowEditModal(false)}
+          selectedBooking={selectedBooking}
+          onSave={handleSaveEdit}
+        />
+        <AssignDriverModal
+          show={showDriverModal}
+          onHide={() => setShowDriverModal(false)}
+          drivers={drivers}
+          onAssign={handleAssignDriver}
+        />
+        <DeleteBookingModal
+          show={showDeleteModal}
+          onHide={() => setShowDeleteModal(false)}
+          onDelete={handleDeleteBooking}
+        />
+        <ChatBot />
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

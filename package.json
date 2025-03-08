@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@genkit-ai/googleai": "^1.1.0",
     "@mui/icons-material": "^6.3.1",
     "@mui/lab": "^6.0.0-beta.22",
     "@mui/material": "^6.3.1",
@@ -20,8 +21,10 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "firebase": "^11.1.0",
+    "genkit": "^1.1.0",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
+    "openai": "^4.86.2",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "querystring-es3": "^0.2.1",
