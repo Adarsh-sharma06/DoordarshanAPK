@@ -194,6 +194,7 @@ h4 {
   /* Adjust table layout on smaller screens */
   .table-responsive {
     overflow-x: scroll;
+    
   }
 }
 
@@ -252,12 +253,14 @@ h4 {
 
 @media (max-width: 480px) {
   /* For very small mobile devices */
-  .Reports-container {
-    flex-direction: row;
-  }
+
 
   .Reports-content {
     margin-left: 0;
+  }
+  .table {
+    overflow-x: scroll;
+    
   }
 
   .table th,

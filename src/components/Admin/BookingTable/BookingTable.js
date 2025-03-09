@@ -5,6 +5,7 @@ const BookingTable = ({ bookings, userNames, onApprove, onReject, onEdit, onDele
   return (
     <div className="booking-details">
       <h4>Booking Details</h4>
+      <div className="overflow-x-auto">
       <table className="table table-striped table-hover">
         <thead>
           <tr>
@@ -54,6 +55,7 @@ const BookingTable = ({ bookings, userNames, onApprove, onReject, onEdit, onDele
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

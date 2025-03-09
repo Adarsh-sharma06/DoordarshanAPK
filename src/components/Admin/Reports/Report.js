@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../ReusableComponents/Sidebar/Sidebar";
 import Navbar from "../../ReusableComponents/Navbar/Navbar";
-import StatusTab from "../../ReusableComponents/StatusTab/StatusTab";
 import { db, collection, getDocs, auth } from "../../../service/firebase"; // Firebase imports
 import { onAuthStateChanged } from "firebase/auth"; // To track auth state
 import { FaPrint } from "react-icons/fa";
 import "./Report.css"; // Custom CSS
+import StatusCards from "../StatusCards/StatusCards";
 
 function Report() {
   const menuSections = [
@@ -170,23 +170,23 @@ function Report() {
       <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
       <div className="Reports-content">
         <Navbar title="Report" userEmail={userEmail} />
-        <div className="mt-4">
-          <StatusTab
-            tabs={[
+
+          <StatusCards
+            tabsData={[
               {
                 heading: "Total Bookings",
                 content: totalData.totalBookings,
-                color: "#333",
+                color: "lightblue",
               },
               {
                 heading: "Total Km Moved",
                 content: totalData.totalKmMoved || 0,
-                color: "f99244",
+                color: "lightcoral",
                 customClass: "totalKM", // Custom class for styling
               },
             ]}
           />
-        </div>
+
 
         <div id="report-content" className="mt-5 rounded-container">
 
@@ -266,7 +266,7 @@ function Report() {
           </div>
 
 
-          <div className="table-responsive">
+          <div className="table">
             <table className="table table-striped table-hover">
               <thead className="thead-dark">
                 <tr>

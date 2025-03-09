@@ -6,7 +6,7 @@ import { db, auth } from "../../../../service/firebase"; // Adjust the path as n
 import Sidebar from "../../../ReusableComponents/Sidebar/Sidebar"; // Adjust the path as needed
 import Navbar from "../../../ReusableComponents/Navbar/Navbar"; // Adjust the path as needed
 import { onAuthStateChanged } from "firebase/auth"; // To track auth state
-
+import "./AddUserForm.css";
 const AddUserForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -125,7 +125,7 @@ const AddUserForm = () => {
       <Sidebar logoText="Doordarshan" menuSections={menuSections} showLogout={true} />
 
       {/* Main Content */}
-      <div className="Reports-content">
+      <div className="Form-content">
         <Navbar title="Add User" userEmail={userEmail} />
 
         <Box

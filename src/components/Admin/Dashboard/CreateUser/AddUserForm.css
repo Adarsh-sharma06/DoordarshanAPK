@@ -1,0 +1,105 @@
+/* Main Form Container */
+.Form-content {
+  margin-left: 200px;
+  flex: 1 1;
+  transition: margin-left 0.3sease-in-out;
+}
+
+/* Form Box */
+.Form-content form {
+  max-width: 450px;
+  width: 100%;
+  padding: 25px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid #e8e8e8;
+}
+
+/* Form Title */
+.Form-content h5 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Input Fields */
+.Form-content .MuiTextField-root {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Submit Button */
+.Form-content .MuiButton-root {
+  background-color: #eb6c0a !important;
+  color: white !important;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 8px;
+  transition: 0.3s ease-in-out;
+}
+
+/* Button Hover Effect */
+.Form-content .MuiButton-root:hover {
+  background-color: #d65b09 !important;
+  box-shadow: 0px 4px 10px rgba(235, 108, 10, 0.4);
+}
+
+/* Success & Error Messages */
+
+
+.Form-content .MuiTypography-colorError {
+  color: #d32f2f !important;
+}
+
+.Form-content .MuiTypography-colorPrimary {
+  color: #2e7d32 !important;
+}
+
+/* ✅ Tablet View (Max Width: 768px) */
+@media (max-width: 768px) {
+  .Form-content {
+    padding: 15px;
+  }
+
+  .Form-content form {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .Form-content h5 {
+    font-size: 20px;
+  }
+
+  .Form-content .MuiButton-root {
+    font-size: 16px;
+    padding: 10px;
+  }
+}
+
+/* ✅ Mobile View (Max Width: 480px) */
+@media (max-width: 480px) {
+  .Form-content {
+    padding: 10px;
+  }
+
+  .Form-content form {
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .Form-content h5 {
+    font-size: 18px;
+  }
+
+  .Form-content .MuiButton-root {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .Form-content .MuiTextField-root {
+    font-size: 14px;
+  }
+}
