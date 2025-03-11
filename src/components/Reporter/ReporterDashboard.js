@@ -70,13 +70,20 @@ function ReporterDashboard() {
     if (startingKM && !isNaN(startingKM)) {
       try {
         const bookingDocRef = doc(db, "bookings", currentBooking.id);
-        await updateDoc(bookingDocRef, { startingKM: parseInt(startingKM, 10) });
+        await updateDoc(bookingDocRef, {
+          startingKM: parseInt(startingKM, 10),
+          status: "onTrip", // Update status to "onTrip"
+        });
+
         setBookings((prev) =>
           prev.map((booking) =>
-            booking.id === currentBooking.id ? { ...booking, startingKM: parseInt(startingKM, 10) } : booking
+            booking.id === currentBooking.id
+              ? { ...booking, startingKM: parseInt(startingKM, 10), status: "onTrip" }
+              : booking
           )
         );
-        toast.success("Starting KM added successfully!");
+
+        toast.success("Starting KM added, status updated to 'onTrip'!");
         resetStartingKMModal();
       } catch (error) {
         console.error("Error updating starting KM:", error);
@@ -282,9 +289,9 @@ function ReporterDashboard() {
                             </OverlayTrigger>
                           )}
 
-                        {booking.status === "Approved" &&
-                          booking.startingKM &&
-                          !booking.endKM &&
+                        {booking.status === "onTrip" && // Ensure it's in progress
+                          booking.startingKM !== undefined && booking.startingKM > 0 &&
+                          (booking.endKM === undefined || booking.endKM === null) && // Ensure endKM is not already set
                           activeTab === "upcoming" && (
                             <OverlayTrigger overlay={<Tooltip>Complete the trip details.</Tooltip>} placement="top">
                               <button
