@@ -27,7 +27,7 @@ function Login() {
       const userDocRef = doc(db, "users", user.email); // Using user.uid instead of user.email
       const userDocSnap = await getDoc(userDocRef);
 
-      console.log("User document snapshot:", userDocSnap.exists()); // Debug: Check if document exists
+      // console.log("User document snapshot:", userDocSnap.exists()); // Debug: Check if document exists
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();

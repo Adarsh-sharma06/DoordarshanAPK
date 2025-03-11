@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { db } from "../../service/firebase";
 import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
 import { Tabs, Tab, Tooltip } from "@mui/material";
-import { FaStar, FaRegStar, FaCalendarAlt, FaMapMarkerAlt, FaCarAlt, FaPhoneAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaMapMarkerAlt, FaCarAlt } from "react-icons/fa";
 import { Modal, Button, Form, OverlayTrigger } from "react-bootstrap";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -95,24 +95,26 @@ function ReporterDashboard() {
           endKM: parseInt(endKM, 10),
           rating,
           description: description || "",
+          status: "Completed", // Update the status to Completed
         });
         setBookings((prev) =>
           prev.map((booking) =>
             booking.id === currentBooking.id
-              ? { ...booking, endKM: parseInt(endKM, 10), rating, description }
+              ? { ...booking, endKM: parseInt(endKM, 10), rating, description, status: "Completed" }
               : booking
           )
         );
-        toast.success("End KM and rating added successfully!");
+        toast.success("End KM, rating added, and status updated to Completed!");
         resetEndKMModal();
       } catch (error) {
         console.error("Error updating booking:", error);
-        toast.error("Failed to add End KM and rating.");
+        toast.error("Failed to add End KM, rating, and update status.");
       }
     } else {
       toast.error("Please fill all fields.");
     }
   };
+
 
   const resetStartingKMModal = () => {
     setStartingKMModalOpen(false);
@@ -153,7 +155,7 @@ function ReporterDashboard() {
           ],
         },
         { heading: "Settings", items: [{ name: "Profile", link: "/Profile", icon: "bi bi-person" }] },
-        ]} 
+        ]}
         showLogout={true}
       />
       <div className="content-container">
